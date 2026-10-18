@@ -1,0 +1,3061 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>7-Segment LCD Meter Synthetic Editor</title>
+
+  <!-- Online fallback for DS-Digital font -->
+  <link rel="preconnect" href="https://fonts.cdnfonts.com">
+  <link href="https://fonts.cdnfonts.com/css/ds-digital" rel="stylesheet">
+
+  <style>
+    @font-face {
+      font-family: 'DS-Digital';
+      src: local('DS-Digital'), local('DS-DIGI'),
+        url('https://fonts.cdnfonts.com/s/14352/DS-DIGI.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-glow: rgba(16, 185, 129, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --panel-width: 360px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    header {
+      background-color: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 16px;
+      padding-top: max(10px, env(safe-area-inset-top, 10px));
+      padding-left: max(16px, env(safe-area-inset-left, 16px));
+      padding-right: max(16px, env(safe-area-inset-right, 16px));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      z-index: 50;
+      width: 100%;
+      max-width: 100vw;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex-shrink: 1;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #0f172a;
+      box-shadow: 0 0 15px var(--accent-glow);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .btn-text-short {
+      display: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #064e3b;
+      font-weight: 700;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--bg-card-hover);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .mobile-view-tabs {
+      display: none;
+    }
+
+    .main-layout {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      position: relative;
+      height: calc(100vh - 58px);
+      height: calc(100dvh - 58px);
+      overflow: hidden;
+      min-height: 0;
+      min-width: 0;
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    /* Canvas Viewport */
+    .viewport-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      background-color: #090d16;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      min-height: 0;
+      min-width: 0;
+    }
+
+    /* Floating Viewport Actions Toolbar */
+    .viewport-toolbar {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      border-radius: 30px;
+      padding: 4px 8px;
+      z-index: 35;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      max-width: calc(100% - 16px);
+      pointer-events: auto;
+    }
+
+    .viewport-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      background: rgba(30, 41, 59, 0.88);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .viewport-tool-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .viewport-tool-btn.active-focus {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .viewport-tool-btn.btn-icon-only {
+      padding: 6px 10px;
+      font-size: 0.95rem;
+    }
+
+    .viewport-zoom-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2px 5px;
+    }
+
+    .viewport-zoom-group .btn-sm {
+      width: 25px;
+      height: 25px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .viewport-zoom-group .btn-sm:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--accent);
+    }
+
+    .zoom-percent {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 36px;
+      text-align: center;
+      user-select: none;
+    }
+
+    .canvas-floating-btn {
+      display: none !important;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      cursor: grab;
+      touch-action: none;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .canvas-wrapper.is-dragging-corner {
+      cursor: crosshair;
+    }
+
+    .canvas-wrapper.is-panning {
+      cursor: grabbing;
+    }
+
+    #mainCanvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    /* Loupe / Magnifier */
+    #magnifier {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+      pointer-events: none;
+      display: none;
+      z-index: 100;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #magnifierCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-overlay {
+      position: absolute;
+      inset: 20px;
+      border: 2px dashed var(--border-color);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: all 0.2s;
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+
+    .upload-overlay:hover {
+      border-color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .upload-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    /* Control Panel (Configuration Section: Independent Smooth Scrolling) */
+    .sidebar {
+      width: var(--panel-width);
+      background-color: var(--bg-card);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100%;
+      z-index: 40;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) var(--bg-dark);
+      -webkit-overflow-scrolling: touch;
+      min-height: 0;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* Mobile & Tablet Responsive Layouts */
+    @media (max-width: 900px) {
+      header {
+        padding: 8px 12px;
+        padding-top: max(8px, env(safe-area-inset-top, 8px));
+        padding-left: max(12px, env(safe-area-inset-left, 12px));
+        padding-right: max(12px, env(safe-area-inset-right, 12px));
+      }
+
+      .brand-title {
+        font-size: 0.95rem;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 6px;
+      }
+
+      .btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        gap: 4px;
+      }
+
+      .mobile-view-tabs {
+        display: flex;
+        background: #090d16;
+        border-bottom: 1px solid var(--border-color);
+        padding: 5px 8px;
+        gap: 6px;
+        flex-shrink: 0;
+        z-index: 45;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .mobile-tab {
+        flex: 1;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .mobile-tab.active {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .main-layout {
+        flex-direction: column;
+        flex: 1;
+        height: auto;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      /* View Mode: Split (Default) */
+      .main-layout,
+      .main-layout[data-mobile-view="split"] {
+        flex-direction: column;
+      }
+
+      .main-layout .viewport-container,
+      .main-layout[data-mobile-view="split"] .viewport-container {
+        flex: none;
+        height: 38vh;
+        min-height: 180px;
+        max-height: 44vh;
+        width: 100%;
+        border-bottom: 2px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        display: flex;
+      }
+
+      .main-layout .sidebar,
+      .main-layout[data-mobile-view="split"] .sidebar {
+        flex: 1;
+        width: 100%;
+        height: auto;
+        border-left: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        min-height: 0;
+        display: flex;
+      }
+
+      /* View Mode: Canvas (Big Canvas Mode) */
+      .main-layout[data-mobile-view="canvas"] .viewport-container {
+        flex: 1;
+        height: 100%;
+        max-height: 100%;
+        border-bottom: none;
+        display: flex;
+      }
+
+      .main-layout[data-mobile-view="canvas"] .sidebar {
+        display: none !important;
+      }
+
+      /* View Mode: Controls (Full Controls Mode) */
+      .main-layout[data-mobile-view="controls"] .viewport-container {
+        flex: none;
+        height: 15vh;
+        min-height: 100px;
+        max-height: 120px;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+      }
+
+      .main-layout[data-mobile-view="controls"] .sidebar {
+        flex: 1;
+        width: 100%;
+        height: auto;
+        border-left: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        min-height: 0;
+        display: flex;
+      }
+
+      .canvas-floating-btn {
+        display: flex;
+      }
+    }
+
+    /* Small Screen / Smartphone Optimizations (screens <= 640px) */
+      .viewport-toolbar {
+        top: 6px;
+        padding: 3px 6px;
+        gap: 3px;
+        max-width: calc(100% - 10px);
+      }
+      .viewport-tool-btn {
+        padding: 4px 8px;
+        font-size: 0.72rem;
+        gap: 3px;
+      }
+      .viewport-zoom-group .btn-sm {
+        width: 22px;
+        height: 22px;
+        font-size: 0.85rem;
+      }
+      .zoom-percent {
+        font-size: 0.68rem;
+        min-width: 28px;
+      }
+    @media (max-width: 640px) {
+      header {
+        padding: 6px 10px;
+        padding-top: max(6px, env(safe-area-inset-top, 6px));
+        padding-left: max(10px, env(safe-area-inset-left, 10px));
+        padding-right: max(10px, env(safe-area-inset-right, 10px));
+        gap: 6px;
+      }
+
+      .brand {
+        gap: 6px;
+        min-width: 0;
+        flex-shrink: 1;
+      }
+
+      .brand-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+
+      .brand-title {
+        font-size: 0.88rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-actions {
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .header-actions .btn {
+        padding: 5px 8px;
+        font-size: 0.78rem;
+        gap: 3px;
+      }
+
+      #btnHeaderAutoDetect,
+      #btnToggleBox {
+        display: none !important;
+      }
+
+      .btn-text-full {
+        display: none;
+      }
+
+      .btn-text-short {
+        display: inline;
+      }
+
+      /* Compact Upload Overlay so it fits comfortably on any mobile screen */
+      .upload-overlay {
+        inset: 10px;
+        padding: 12px 10px;
+        gap: 8px;
+        border-radius: 12px;
+      }
+
+      .upload-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+      }
+
+      .upload-overlay h3 {
+        font-size: 0.95rem !important;
+      }
+
+      .upload-overlay p {
+        font-size: 0.76rem !important;
+        max-width: 250px !important;
+        line-height: 1.3;
+      }
+
+      .upload-overlay .btn {
+        padding: 5px 12px;
+        font-size: 0.8rem;
+        margin-top: 2px !important;
+      }
+
+      /* Compact Sidebar Panels */
+      .panel-section {
+        padding: 12px 12px;
+      }
+
+      .section-title {
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+      }
+
+      .step-card {
+        padding: 10px 10px;
+        font-size: 0.8rem;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .step-num {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+      }
+
+      .form-group {
+        margin-bottom: 12px;
+      }
+
+      .form-label {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+      }
+
+      .input-text {
+        padding: 8px 10px;
+        font-size: 0.92rem;
+      }
+
+      .input-digital {
+        font-size: 1.25rem;
+        letter-spacing: 1.5px;
+      }
+
+      .font-preview {
+        font-size: 1.6rem;
+        padding: 6px;
+        min-height: 42px;
+        margin-top: 8px;
+      }
+
+      .slider {
+        height: 8px;
+      }
+
+      .slider::-webkit-slider-thumb {
+        width: 22px;
+        height: 22px;
+      }
+
+      .sidebar {
+        padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+      }
+    }
+
+    /* Mobile landscape support */
+    @media (max-width: 900px) and (orientation: landscape) {
+
+      .main-layout,
+      .main-layout[data-mobile-view="split"],
+      .main-layout[data-mobile-view="controls"] {
+        flex-direction: row !important;
+      }
+
+      .viewport-container,
+      .main-layout[data-mobile-view="split"] .viewport-container,
+      .main-layout[data-mobile-view="controls"] .viewport-container {
+        flex: 1 !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-bottom: none !important;
+        border-right: 1px solid var(--border-color);
+      }
+
+      .sidebar,
+      .main-layout[data-mobile-view="split"] .sidebar,
+      .main-layout[data-mobile-view="controls"] .sidebar {
+        width: 320px !important;
+        height: 100% !important;
+        border-left: 1px solid var(--border-color);
+        display: flex !important;
+      }
+
+      .mobile-view-tabs {
+        display: none !important;
+      }
+    }
+
+    .panel-section {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: var(--bg-card-hover);
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: none;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .form-val {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-text:focus {
+      border-color: var(--accent);
+    }
+
+    .input-digital {
+      font-family: 'DS-Digital', monospace, sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 2px;
+      color: #34d399;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 10px;
+    }
+
+    /* Custom Sliders */
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border-color);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: transform 0.1s;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Step Indicators */
+    .step-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #064e3b;
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .step-text strong {
+      color: var(--text-main);
+    }
+
+    /* Hidden file input */
+    #fileInput {
+      display: none;
+    }
+
+    /* Live Preview Bar */
+    .font-preview {
+      background: #092e20;
+      border: 1px solid #059669;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-family: 'DS-Digital', monospace;
+      font-size: 2rem;
+      color: #10b981;
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+      margin-top: 10px;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .unit-preview {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.9rem;
+      margin-left: 6px;
+      color: #6ee7b7;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--accent);
+      color: #f8fafc;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 90vw;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Toast Element -->
+  <div id="toastNotification" class="toast" style="display: none; opacity: 0;"></div>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">7S</div>
+      <div>
+        <div class="brand-title">LCD Synthetic OCR Editor</div>
+        <div class="brand-subtitle">Photorealistic 7-Segment Inpainter & Perspective Aligner</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" id="btnHeaderAutoDetect"
+        style="background: linear-gradient(135deg, #2563eb, #3b82f6); font-weight: 600;"
+        title="Automatically detect the rectangular LCD screen">
+        ⚡ Auto-Detect Screen
+      </button>
+      <button class="btn btn-secondary" id="btnToggleBox" title="Toggle Selection Box and Corner Handles (Shortcut: H)">
+        👁️ Hide Box
+      </button>
+      <button class="btn btn-secondary" id="btnUploadTrigger" title="Open Photo">
+        📁 <span class="btn-text-full">Open Photo</span><span class="btn-text-short">Open</span>
+      </button>
+      <button class="btn btn-primary" id="btnDownload" disabled title="Download Result">
+        💾 <span class="btn-text-full">Download Result</span><span class="btn-text-short">Save</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Mode Tabs (Visible on screens <= 900px) -->
+  <div class="mobile-view-tabs" id="mobileViewTabs">
+    <button class="mobile-tab active" data-view="split" title="Split Screen (Canvas + Controls)">↕ Split</button>
+    <button class="mobile-tab" data-view="canvas" title="Large Canvas View">🔍 Canvas</button>
+    <button class="mobile-tab" data-view="controls" title="Full Controls View">🎛️ Controls</button>
+  </div>
+
+  <!-- Main Workspace -->
+  <div class="main-layout" data-mobile-view="split">
+
+    <!-- Canvas Area -->
+    <div class="viewport-container" id="viewport">
+
+      <!-- Upload Overlay (shown before image is uploaded) -->
+      <div class="upload-overlay" id="uploadOverlay">
+        <div class="upload-icon">📷</div>
+        <h3 style="font-size: 1.2rem;">Drop or Select an LCD Photo</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; max-width: 320px;">
+          Upload any photo of a green 7-segment digital screen (e.g. electric meter, thermometer, weighing scale).
+        </p>
+        <button class="btn btn-primary" style="margin-top: 8px;">Select File</button>
+      </div>
+
+      <!-- Main Interactive Canvas -->
+      <div class="canvas-wrapper" id="canvasWrapper" style="display: none;">
+        <canvas id="mainCanvas"></canvas>
+      </div>
+
+      <!-- Corner Drag Magnifier Loupe -->
+      <div id="magnifier">
+        <canvas id="magnifierCanvas"></canvas>
+      </div>
+
+      <!-- Floating Viewport Actions Toolbar -->
+      <div class="viewport-toolbar" id="viewportToolbar">
+        <button id="btnFocusLCD" class="viewport-tool-btn" title="Zoom directly into LCD Screen (Shortcut: F)">
+          <span class="tool-icon">🎯</span>
+          <span class="tool-text">Focus LCD</span>
+        </button>
+        <button id="btnToggleHandlesFloat" class="viewport-tool-btn" title="Toggle Corner Handles / Guides (Shortcut: H)">
+          <span class="tool-icon">👁️</span>
+          <span class="tool-text">Handles</span>
+        </button>
+        <div class="viewport-zoom-group">
+          <button id="btnZoomOut" class="viewport-tool-btn btn-sm" title="Zoom Out (−)">−</button>
+          <span id="zoomPercentLabel" class="zoom-percent">100%</span>
+          <button id="btnZoomIn" class="viewport-tool-btn btn-sm" title="Zoom In (+)">+</button>
+          <button id="btnResetZoom" class="viewport-tool-btn btn-sm" title="Reset View (0)">↺</button>
+        </div>
+        <button id="btnFloatingViewToggle" class="viewport-tool-btn btn-icon-only" title="Toggle Fullscreen Canvas">
+          ⛶
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Right Controls Sidebar -->
+    <div class="sidebar">
+
+      <!-- Instructions & Mode -->
+      <div class="panel-section">
+        <div class="section-title">
+          <span>Screen Alignment</span>
+          <span class="badge" id="quadStatus">4 Points Ready</span>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            Tap <strong>"Auto-Detect Screen"</strong> to snap corners instantly. Drag handles (TL, TR, BR, BL) if you
+            need micro-tuning.
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btnAutoDetect"
+            style="flex: 1 1 100%; font-size: 0.88rem; background: linear-gradient(135deg, #2563eb, #3b82f6); justify-content: center; font-weight: 600; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+            ⚡ Auto-Detect Screen
+          </button>
+          <button class="btn btn-secondary" id="btnSideToggleBox" style="flex: 1; font-size: 0.85rem;">
+            👁️ Hide Box
+          </button>
+          <button class="btn btn-secondary" id="btnResetCorners" style="flex: 1; font-size: 0.85rem;">
+            🔄 Reset
+          </button>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label
+            style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); user-select: none;">
+            <input type="checkbox" id="checkShowDashedLine"
+              style="accent-color: var(--accent); width: 16px; height: 16px;">
+            <span>Show dashed rectangular box outline</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Reading Inputs -->
+      <div class="panel-section">
+        <div class="section-title">
+          <span>Text Replacement</span>
+        </div>
+
+        <div class="form-group">
+          <div class="input-row">
+            <div>
+              <label class="form-label">Main Reading</label>
+              <input type="text" id="inputReading" class="input-text input-digital" value="000812" placeholder="000812">
+            </div>
+            <div>
+              <label class="form-label">Unit Suffix</label>
+              <input type="text" id="inputUnit" class="input-text" value="kWh" placeholder="kWh">
+            </div>
+          </div>
+          <div style="margin-top: 8px;">
+            <label
+              style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); user-select: none;">
+              <input type="checkbox" id="checkFixedSlots" checked
+                style="accent-color: var(--accent); width: 16px; height: 16px;">
+              <span>Fixed 6-digit meter layout (000812)</span>
+            </label>
+          </div>
+          <div class="font-preview" id="fontPreview">
+            <span id="previewReading">000812</span>
+            <span class="unit-preview" id="previewUnit">kWh</span>
+          </div>
+
+          <!-- Unit (kWh) Position & Scale Controls (Left, Right, Up, Down) -->
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--accent);">Unit (kWh) Position &
+                Scale</span>
+              <button id="btnResetUnitPos" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;"
+                title="Reset Unit position">↺ Reset</button>
+            </div>
+
+            <!-- Quick 4-Way D-Pad Nudge Buttons -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+              <button id="btnUnitLeft" class="btn btn-secondary"
+                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Left">⬅️
+                Left</button>
+              <button id="btnUnitRight" class="btn btn-secondary"
+                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Right">➡️
+                Right</button>
+              <button id="btnUnitUp" class="btn btn-secondary"
+                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Up">⬆️
+                Up</button>
+              <button id="btnUnitDown" class="btn btn-secondary"
+                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Down">⬇️
+                Down</button>
+            </div>
+
+            <!-- Unit Horizontal Slider (Left / Right) -->
+            <div class="form-group" style="margin-bottom: 8px;">
+              <div class="form-label">
+                <span>Unit Horizontal (Left / Right)</span>
+                <span class="form-val" id="valUnitOffsetX">0%</span>
+              </div>
+              <input type="range" id="sliderUnitOffsetX" class="slider" min="-30" max="30" value="0">
+            </div>
+
+            <!-- Unit Vertical Slider (Up / Down) -->
+            <div class="form-group" style="margin-bottom: 8px;">
+              <div class="form-label">
+                <span>Unit Vertical (Up / Down)</span>
+                <span class="form-val" id="valUnitOffsetY">0%</span>
+              </div>
+              <input type="range" id="sliderUnitOffsetY" class="slider" min="-30" max="30" value="0">
+            </div>
+
+            <!-- Unit Scale / Size Slider -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <div class="form-label">
+                <span>Unit Size</span>
+                <span class="form-val" id="valUnitScale">44%</span>
+              </div>
+              <input type="range" id="sliderUnitScale" class="slider" min="20" max="80" value="44">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photorealistic Sliders -->
+      <div class="panel-section">
+        <div class="section-title">
+          <span>Realism & Compositing</span>
+        </div>
+
+        <!-- 1-Click Reference Match Preset Button -->
+        <button id="btnApplyReferencePreset" class="btn btn-primary"
+          style="width: 100%; margin-bottom: 14px; background: linear-gradient(135deg, #059669, #10b981); justify-content: center; font-weight: 600; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+          ✨ Apply Reference Configuration
+        </button>
+
+        <!-- Emerald Backlight Glow (Subtle color enhancement for dull screens) -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Emerald Screen Backlight Glow</span>
+            <span class="form-val" id="valEmeraldGlow">0%</span>
+          </div>
+          <input type="range" id="sliderEmeraldGlow" class="slider" min="0" max="100" value="0">
+        </div>
+
+        <!-- Segment Slant (Italic) -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Segment Forward Slant</span>
+            <span class="form-val" id="valSlant">7°</span>
+          </div>
+          <input type="range" id="sliderSlant" class="slider" min="0" max="15" value="7">
+        </div>
+
+        <!-- Ghost / Unlit Segments -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Unlit Ghost Segments</span>
+            <span class="form-val" id="valGhost">6%</span>
+          </div>
+          <input type="range" id="sliderGhost" class="slider" min="0" max="30" value="6">
+        </div>
+
+        <!-- Surface Dust & Scuffs -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Surface Dust & Scuffs</span>
+            <span class="form-val" id="valDust">25%</span>
+          </div>
+          <input type="range" id="sliderDust" class="slider" min="0" max="100" value="25">
+        </div>
+
+        <!-- Text Size -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Text Scale</span>
+            <span class="form-val" id="valTextSize">72%</span>
+          </div>
+          <input type="range" id="sliderTextSize" class="slider" min="20" max="95" value="72">
+        </div>
+
+        <!-- Position Offset X -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Horizontal Offset (X)</span>
+            <span class="form-val" id="valOffsetX">0%</span>
+          </div>
+          <input type="range" id="sliderOffsetX" class="slider" min="-40" max="40" value="0">
+        </div>
+
+        <!-- Position Offset Y -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Vertical Offset (Y)</span>
+            <span class="form-val" id="valOffsetY">0%</span>
+          </div>
+          <input type="range" id="sliderOffsetY" class="slider" min="-40" max="40" value="0">
+        </div>
+
+        <!-- Lens Softness (Gaussian Blur) -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Camera Lens Softness</span>
+            <span class="form-val" id="valBlur">0.6 px</span>
+          </div>
+          <input type="range" id="sliderBlur" class="slider" min="0" max="40" value="6">
+        </div>
+
+        <!-- Text Darkness / Opacity -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Segment Darkness</span>
+            <span class="form-val" id="valOpacity">92%</span>
+          </div>
+          <input type="range" id="sliderOpacity" class="slider" min="40" max="100" value="92">
+        </div>
+
+        <!-- Glass Reflection Layer Blend -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Under-Glass Glare & Grain</span>
+            <span class="form-val" id="valReflection">25%</span>
+          </div>
+          <input type="range" id="sliderReflection" class="slider" min="0" max="100" value="25">
+        </div>
+
+        <!-- Inpaint Strength / Threshold -->
+        <div class="form-group">
+          <div class="form-label">
+            <span>Backlight Inpaint Fill</span>
+            <span class="form-val" id="valInpaint">35%</span>
+          </div>
+          <input type="range" id="sliderInpaint" class="slider" min="0" max="100" value="35">
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <input type="file" id="fileInput" accept="image/*">
+
+  <!-- Core JavaScript Pipeline -->
+  <script>
+    // State Management
+    let sourceImage = null;
+    let imgWidth = 0;
+    let imgHeight = 0;
+
+    // 4 Corner Points in natural image coordinates [TL, TR, BR, BL]
+    let quadPoints = [
+      { x: 100, y: 100, name: 'TL' },
+      { x: 300, y: 100, name: 'TR' },
+      { x: 300, y: 200, name: 'BR' },
+      { x: 100, y: 200, name: 'BL' }
+    ];
+
+    let activePointIndex = -1;
+    let isDragging = false;
+    let displayScale = 1.0;
+
+    // Live Pan, Zoom & Interaction State
+    let currentZoom = 1.0;
+    let currentPanX = 0;
+    let currentPanY = 0;
+    let isFocusLcd = false;
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let isInteractingWithControls = false;
+    let controlInteractionTimer = null;
+
+    // Selection Box & Guides State
+    let showSelectionBox = true;
+
+    // DOM Elements
+    const fileInput = document.getElementById('fileInput');
+    const uploadOverlay = document.getElementById('uploadOverlay');
+    const btnUploadTrigger = document.getElementById('btnUploadTrigger');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnResetCorners = document.getElementById('btnResetCorners');
+    const btnToggleBox = document.getElementById('btnToggleBox');
+    const btnSideToggleBox = document.getElementById('btnSideToggleBox');
+    const btnAutoDetect = document.getElementById('btnAutoDetect');
+    const btnHeaderAutoDetect = document.getElementById('btnHeaderAutoDetect');
+    const checkShowDashedLine = document.getElementById('checkShowDashedLine');
+    const canvasWrapper = document.getElementById('canvasWrapper');
+    const mainCanvas = document.getElementById('mainCanvas');
+    const ctx = mainCanvas.getContext('2d', { willReadFrequently: true });
+
+    // Magnifier DOM
+    const magnifier = document.getElementById('magnifier');
+    const magCanvas = document.getElementById('magnifierCanvas');
+    const magCtx = magCanvas.getContext('2d');
+    magCanvas.width = 120;
+    magCanvas.height = 120;
+
+    // Inputs & Sliders
+    const inputReading = document.getElementById('inputReading');
+    const inputUnit = document.getElementById('inputUnit');
+    const checkFixedSlots = document.getElementById('checkFixedSlots');
+    const previewReading = document.getElementById('previewReading');
+    const previewUnit = document.getElementById('previewUnit');
+
+    const sliderSlant = document.getElementById('sliderSlant');
+    const valSlant = document.getElementById('valSlant');
+    const sliderGhost = document.getElementById('sliderGhost');
+    const valGhost = document.getElementById('valGhost');
+    const sliderDust = document.getElementById('sliderDust');
+    const valDust = document.getElementById('valDust');
+
+    const sliderTextSize = document.getElementById('sliderTextSize');
+    const valTextSize = document.getElementById('valTextSize');
+    const sliderOffsetX = document.getElementById('sliderOffsetX');
+    const valOffsetX = document.getElementById('valOffsetX');
+    const sliderOffsetY = document.getElementById('sliderOffsetY');
+    const valOffsetY = document.getElementById('valOffsetY');
+    const sliderBlur = document.getElementById('sliderBlur');
+    const valBlur = document.getElementById('valBlur');
+    const sliderOpacity = document.getElementById('sliderOpacity');
+    const valOpacity = document.getElementById('valOpacity');
+    const sliderReflection = document.getElementById('sliderReflection');
+    const valReflection = document.getElementById('valReflection');
+    const sliderInpaint = document.getElementById('sliderInpaint');
+    const valInpaint = document.getElementById('valInpaint');
+    const btnApplyReferencePreset = document.getElementById('btnApplyReferencePreset');
+    const sliderEmeraldGlow = document.getElementById('sliderEmeraldGlow');
+    const valEmeraldGlow = document.getElementById('valEmeraldGlow');
+
+    // Unit Position & Scale Controls
+    const sliderUnitOffsetX = document.getElementById('sliderUnitOffsetX');
+    const valUnitOffsetX = document.getElementById('valUnitOffsetX');
+    const sliderUnitOffsetY = document.getElementById('sliderUnitOffsetY');
+    const valUnitOffsetY = document.getElementById('valUnitOffsetY');
+    const sliderUnitScale = document.getElementById('sliderUnitScale');
+    const valUnitScale = document.getElementById('valUnitScale');
+    const btnUnitLeft = document.getElementById('btnUnitLeft');
+    const btnUnitRight = document.getElementById('btnUnitRight');
+    const btnUnitUp = document.getElementById('btnUnitUp');
+    const btnUnitDown = document.getElementById('btnUnitDown');
+    const btnResetUnitPos = document.getElementById('btnResetUnitPos');
+
+    // Attach File Upload Event Listeners
+    uploadOverlay.addEventListener('click', () => fileInput.click());
+    btnUploadTrigger.addEventListener('click', () => fileInput.click());
+
+    // Drag and Drop Upload Support
+    window.addEventListener('dragover', (e) => e.preventDefault());
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        loadImageFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        loadImageFile(e.target.files[0]);
+      }
+    });
+
+    function loadImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          sourceImage = img;
+          imgWidth = img.naturalWidth || img.width;
+          imgHeight = img.naturalHeight || img.height;
+
+          mainCanvas.width = imgWidth;
+          mainCanvas.height = imgHeight;
+
+          // Compute initial 4-point quadrilateral centered in image
+          resetDefaultCorners();
+
+          uploadOverlay.style.display = 'none';
+          canvasWrapper.style.display = 'block';
+          btnDownload.disabled = false;
+
+          resizeViewport();
+
+          // Automatically detect the green rectangular LCD screen!
+          const detected = autoDetectScreenQuad(true);
+          if (!detected) {
+            renderPipeline();
+          }
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetDefaultCorners() {
+      if (!imgWidth || !imgHeight) return;
+      // Default initial rectangle: horizontal LCD ratio ~3.2:1 in upper-middle of meter
+      const boxW = Math.round(imgWidth * 0.44);
+      const boxH = Math.round(boxW / 3.2);
+      const startX = Math.round((imgWidth - boxW) * 0.42);
+      const startY = Math.round(imgHeight * 0.28);
+
+      quadPoints = [
+        { x: startX, y: startY, name: 'TL' },
+        { x: startX + boxW, y: startY, name: 'TR' },
+        { x: startX + boxW, y: startY + boxH, name: 'BR' },
+        { x: startX, y: startY + boxH, name: 'BL' }
+      ];
+      renderPipeline();
+    }
+
+    btnResetCorners.addEventListener('click', resetDefaultCorners);
+
+    // Toast Notification Helper
+    function showToast(message, duration = 3000) {
+      let toast = document.getElementById('toastNotification');
+      if (!toast) return;
+      toast.innerHTML = message;
+      toast.style.display = 'flex';
+      void toast.offsetWidth; // Force CSS reflow
+      toast.style.opacity = '1';
+
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+      }, duration);
+    }
+
+    /**
+     * Automatic Green LCD Screen Detector
+     * Analyzes image pixel chromaticity and geometry to find the exact rectangular LCD screen,
+     * computing the 4 corner points with perspective tilt angle for instant 1-tap alignment.
+     */
+    function autoDetectScreenQuad(showToastMsg = true) {
+      if (!sourceImage || !imgWidth || !imgHeight) return false;
+
+      // 1. Downscale to fast analysis buffer for instant 60 FPS detection on mobile
+      const maxDim = 400;
+      const scale = Math.min(maxDim / imgWidth, maxDim / imgHeight, 1.0);
+      const dw = Math.round(imgWidth * scale);
+      const dh = Math.round(imgHeight * scale);
+
+      const dCanvas = document.createElement('canvas');
+      dCanvas.width = dw;
+      dCanvas.height = dh;
+      const dCtx = dCanvas.getContext('2d', { willReadFrequently: true });
+      dCtx.drawImage(sourceImage, 0, 0, dw, dh);
+
+      const imgData = dCtx.getImageData(0, 0, dw, dh);
+      const data = imgData.data;
+
+      // 2. Identify True LCD Green pixels (filters out beige/grey meter plastic)
+      // Real utility meter LCDs have excess green: g - max(r, b) >= 11
+      const matches = [];
+
+      for (let y = 0; y < dh; y++) {
+        for (let x = 0; x < dw; x++) {
+          const idx = (y * dw + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+
+          const maxC = Math.max(r, g, b);
+          const minC = Math.min(r, g, b);
+          const delta = maxC - minC;
+          if (delta === 0) continue;
+
+          let h = 0;
+          if (maxC === r) h = ((g - b) / delta) % 6;
+          else if (maxC === g) h = (b - r) / delta + 2;
+          else h = (r - g) / delta + 4;
+          h = Math.round(h * 60);
+          if (h < 0) h += 360;
+
+          const sat = delta / maxC;
+          const greenDiff = g - Math.max(r, b);
+
+          // Real LCD signature: true green hue band (68° - 165°), healthy saturation, strong green dominance
+          // Exclude point LED indicator lights (extreme brightness g > 195, r < 90)
+          if (greenDiff >= 11 && (h >= 68 && h <= 165) && sat >= 0.13 && g >= 48) {
+            if (!(g > 195 && r < 90 && greenDiff > 70)) {
+              matches.push({ x, y });
+            }
+          }
+        }
+      }
+
+      // If too few green pixels detected, fallback to centered horizontal LCD box
+      if (matches.length < 40) {
+        if (showToastMsg) showToast("⚠️ Green screen not detected with certainty. Placed default LCD box.");
+        resetDefaultCorners();
+        return false;
+      }
+
+      // 3. Robust column histogram analysis to separate the tall LCD display from the small LED indicator bulb
+      const colCounts = new Int32Array(dw);
+      matches.forEach(p => colCounts[p.x]++);
+      let maxCol = 0;
+      for (let i = 0; i < dw; i++) {
+        if (colCounts[i] > maxCol) maxCol = colCounts[i];
+      }
+
+      // Find the screen start column (LCD panel is tall; small LED is excluded)
+      let minXCut = 0;
+      for (let i = 0; i < dw; i++) {
+        if (colCounts[i] >= maxCol * 0.55) {
+          minXCut = i;
+          break;
+        }
+      }
+
+      const screenMatches = matches.filter(p => p.x >= minXCut);
+      const candidateMatches = screenMatches.length >= 30 ? screenMatches : matches;
+
+      // 4. Outlier filtering using Interquartile Range (IQR) to reject stray reflections
+      const xs = candidateMatches.map(p => p.x).sort((a, b) => a - b);
+      const ys = candidateMatches.map(p => p.y).sort((a, b) => a - b);
+
+      const q1x = xs[Math.floor(xs.length * 0.25)];
+      const q3x = xs[Math.floor(xs.length * 0.75)];
+      const iqrX = Math.max(q3x - q1x, 6);
+
+      const q1y = ys[Math.floor(ys.length * 0.25)];
+      const q3y = ys[Math.floor(ys.length * 0.75)];
+      const iqrY = Math.max(q3y - q1y, 6);
+
+      const filtered = candidateMatches.filter(p =>
+        p.x >= (q1x - 1.8 * iqrX) && p.x <= (q3x + 1.8 * iqrX) &&
+        p.y >= (q1y - 1.8 * iqrY) && p.y <= (q3y + 1.8 * iqrY)
+      );
+
+      if (filtered.length < 30) {
+        resetDefaultCorners();
+        return false;
+      }
+
+      // 4. Sample up to 300 points from filtered matches for instant 60 FPS calculation
+      const step = Math.max(1, Math.floor(filtered.length / 300));
+      const samplePoints = [];
+      for (let i = 0; i < filtered.length; i += step) {
+        samplePoints.push(filtered[i]);
+      }
+
+      let bestAngle = 0;
+      let minBoundingArea = Infinity;
+      let bestBounds = null;
+
+      for (let deg = -20; deg <= 20; deg += 1) {
+        const rad = (deg * Math.PI) / 180;
+        const cosA = Math.cos(rad);
+        const sinA = Math.sin(rad);
+
+        let rxMin = Infinity, rxMax = -Infinity;
+        let ryMin = Infinity, ryMax = -Infinity;
+
+        for (let i = 0; i < samplePoints.length; i++) {
+          const pt = samplePoints[i];
+          const rx = pt.x * cosA + pt.y * sinA;
+          const ry = -pt.x * sinA + pt.y * cosA;
+          if (rx < rxMin) rxMin = rx;
+          if (rx > rxMax) rxMax = rx;
+          if (ry < ryMin) ryMin = ry;
+          if (ry > ryMax) ryMax = ry;
+        }
+
+        const area = (rxMax - rxMin) * (ryMax - ryMin);
+        if (area < minBoundingArea) {
+          minBoundingArea = area;
+          bestAngle = deg;
+          bestBounds = { rxMin, rxMax, ryMin, ryMax };
+        }
+      }
+
+      // Reconstruct 4 corners of oriented rectangle
+      const bRad = (bestAngle * Math.PI) / 180;
+      const bCos = Math.cos(bRad);
+      const bSin = Math.sin(bRad);
+
+      function unrotateToFull(rx, ry) {
+        const x = (rx * bCos - ry * bSin) / scale;
+        const y = (rx * bSin + ry * bCos) / scale;
+        return { x: Math.round(x), y: Math.round(y) };
+      }
+
+      const pTL = unrotateToFull(bestBounds.rxMin, bestBounds.ryMin);
+      const pTR = unrotateToFull(bestBounds.rxMax, bestBounds.ryMin);
+      const pBR = unrotateToFull(bestBounds.rxMax, bestBounds.ryMax);
+      const pBL = unrotateToFull(bestBounds.rxMin, bestBounds.ryMax);
+
+      // Validate dimensions & aspect ratio
+      const detectedW = Math.hypot(pTR.x - pTL.x, pTR.y - pTL.y);
+      const detectedH = Math.hypot(pBL.x - pTL.x, pBL.y - pTL.y);
+      const aspect = detectedW / (detectedH || 1);
+
+      // Utility meter LCD displays typically have aspect ratio between 1.5 and 6.0
+      if (aspect < 1.3 || aspect > 7.0 || detectedW < (imgWidth * 0.15) || detectedW > (imgWidth * 0.85)) {
+        if (showToastMsg) showToast("⚠️ Placed default horizontal LCD box for meter.");
+        resetDefaultCorners();
+        return false;
+      }
+
+      quadPoints = [
+        { x: pTL.x, y: pTL.y, name: 'TL' },
+        { x: pTR.x, y: pTR.y, name: 'TR' },
+        { x: pBR.x, y: pBR.y, name: 'BR' },
+        { x: pBL.x, y: pBL.y, name: 'BL' }
+      ];
+
+      renderPipeline();
+      if (window.innerWidth <= 900) {
+        setTimeout(() => focusOnLcdScreen(true), 120);
+      }
+      if (showToastMsg) showToast("⚡ LCD Screen auto-detected successfully!");
+      return true;
+    }
+
+    if (btnAutoDetect) {
+      btnAutoDetect.addEventListener('click', () => autoDetectScreenQuad(true));
+    }
+    if (btnHeaderAutoDetect) {
+      btnHeaderAutoDetect.addEventListener('click', () => autoDetectScreenQuad(true));
+    }
+
+    // Pan, Zoom & LCD Focus Engine
+    function applyCanvasTransform(animate = false) {
+      if (!canvasWrapper) return;
+      if (animate) {
+        canvasWrapper.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)';
+      } else {
+        canvasWrapper.style.transition = 'none';
+      }
+      canvasWrapper.style.transform = `translate3d(${Math.round(currentPanX)}px, ${Math.round(currentPanY)}px, 0px) scale(${currentZoom.toFixed(3)})`;
+
+      const zoomLabel = document.getElementById('zoomPercentLabel');
+      if (zoomLabel) {
+        zoomLabel.textContent = `${Math.round(currentZoom * 100)}%`;
+      }
+
+      const btnFocus = document.getElementById('btnFocusLCD');
+      if (btnFocus) {
+        if (isFocusLcd) {
+          btnFocus.classList.add('active-focus');
+          btnFocus.innerHTML = '<span class="tool-icon">🔍</span><span class="tool-text">Full View</span>';
+        } else {
+          btnFocus.classList.remove('active-focus');
+          btnFocus.innerHTML = '<span class="tool-icon">🎯</span><span class="tool-text">Focus LCD</span>';
+        }
+      }
+    }
+
+    function focusOnLcdScreen(animate = true) {
+      if (!sourceImage || !viewport || !quadPoints || quadPoints.length < 4) return;
+
+      const minX = Math.min(...quadPoints.map(p => p.x));
+      const maxX = Math.max(...quadPoints.map(p => p.x));
+      const minY = Math.min(...quadPoints.map(p => p.y));
+      const maxY = Math.max(...quadPoints.map(p => p.y));
+
+      const quadW = Math.max(maxX - minX, 50);
+      const quadH = Math.max(maxY - minY, 25);
+      const quadCenterX = (minX + maxX) / 2;
+      const quadCenterY = (minY + maxY) / 2;
+
+      const vpW = viewport.clientWidth;
+      const vpH = viewport.clientHeight;
+
+      const targetScaleX = (vpW * 0.82) / (quadW * displayScale);
+      const targetScaleY = (vpH * 0.82) / (quadH * displayScale);
+      const targetZoom = Math.max(1.0, Math.min(targetScaleX, targetScaleY, 8.0));
+
+      const canvasW = imgWidth * displayScale;
+      const canvasH = imgHeight * displayScale;
+      const canvasCenterX = canvasW / 2;
+      const canvasCenterY = canvasH / 2;
+
+      const quadScreenX = quadCenterX * displayScale;
+      const quadScreenY = quadCenterY * displayScale;
+
+      const offsetX = quadScreenX - canvasCenterX;
+      const offsetY = quadScreenY - canvasCenterY;
+
+      currentZoom = targetZoom;
+      currentPanX = -offsetX * targetZoom;
+      currentPanY = -offsetY * targetZoom;
+      isFocusLcd = true;
+
+      applyCanvasTransform(animate);
+    }
+
+    function resetCanvasView(animate = true) {
+      currentZoom = 1.0;
+      currentPanX = 0;
+      currentPanY = 0;
+      isFocusLcd = false;
+      applyCanvasTransform(animate);
+    }
+
+    function toggleFocusLcd() {
+      if (isFocusLcd) {
+        resetCanvasView(true);
+      } else {
+        focusOnLcdScreen(true);
+      }
+    }
+
+    function notifyControlInteraction() {
+      isInteractingWithControls = true;
+      if (controlInteractionTimer) clearTimeout(controlInteractionTimer);
+      renderPipeline(true);
+      controlInteractionTimer = setTimeout(() => {
+        isInteractingWithControls = false;
+        renderPipeline(true);
+      }, 1200);
+    }
+
+    // Responsive Canvas Display Scaling
+    function resizeViewport() {
+      if (!sourceImage) return;
+      const viewport = document.getElementById('viewport');
+      if (!viewport) return;
+      const isMobile = window.innerWidth <= 600;
+      const pad = isMobile ? 12 : 36;
+      const maxW = Math.max(viewport.clientWidth - pad, 60);
+      const maxH = Math.max(viewport.clientHeight - pad, 60);
+
+      const scaleX = maxW / imgWidth;
+      const scaleY = maxH / imgHeight;
+      displayScale = Math.min(scaleX, scaleY, 1.0);
+
+      mainCanvas.style.width = `${Math.round(imgWidth * displayScale)}px`;
+      mainCanvas.style.height = `${Math.round(imgHeight * displayScale)}px`;
+
+      if (isFocusLcd) {
+        focusOnLcdScreen(false);
+      } else {
+        applyCanvasTransform(false);
+      }
+    }
+
+    // Mobile View Tabs State Management
+    let currentMobileView = 'split';
+    const mainLayout = document.querySelector('.main-layout');
+    const mobileViewTabs = document.getElementById('mobileViewTabs');
+    const btnFloatingViewToggle = document.getElementById('btnFloatingViewToggle');
+
+    function setMobileView(viewMode) {
+      currentMobileView = viewMode;
+      if (mainLayout) {
+        mainLayout.setAttribute('data-mobile-view', viewMode);
+      }
+      if (mobileViewTabs) {
+        mobileViewTabs.querySelectorAll('.mobile-tab').forEach(tab => {
+          if (tab.dataset.view === viewMode) {
+            tab.classList.add('active');
+          } else {
+            tab.classList.remove('active');
+          }
+        });
+      }
+      if (btnFloatingViewToggle) {
+        btnFloatingViewToggle.innerHTML = (viewMode === 'canvas') ? '↕' : '⛶';
+        btnFloatingViewToggle.title = (viewMode === 'canvas') ? 'Restore Split View' : 'Enlarge Canvas View';
+      }
+      // Force immediate resize & render on tab switch
+      setTimeout(() => {
+        resizeViewport();
+        renderPipeline(true);
+      }, 50);
+    }
+
+    if (mobileViewTabs) {
+      mobileViewTabs.querySelectorAll('.mobile-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          setMobileView(tab.dataset.view);
+        });
+      });
+    }
+
+    if (btnFloatingViewToggle) {
+      btnFloatingViewToggle.addEventListener('click', () => {
+        if (currentMobileView === 'canvas') {
+          setMobileView('split');
+        } else {
+          setMobileView('canvas');
+        }
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      resizeViewport();
+      renderPipeline();
+    });
+
+    // Slider Event Listeners & Live Updates
+    sliderSlant.addEventListener('input', (e) => {
+      valSlant.textContent = `${e.target.value}°`;
+      renderPipeline();
+    });
+    sliderGhost.addEventListener('input', (e) => {
+      valGhost.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    sliderDust.addEventListener('input', (e) => {
+      valDust.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    checkFixedSlots.addEventListener('change', () => {
+      renderPipeline();
+    });
+
+    sliderTextSize.addEventListener('input', (e) => {
+      valTextSize.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    sliderOffsetX.addEventListener('input', (e) => {
+      valOffsetX.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    sliderOffsetY.addEventListener('input', (e) => {
+      valOffsetY.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    sliderBlur.addEventListener('input', (e) => {
+      valBlur.textContent = `${(e.target.value / 10).toFixed(1)} px`;
+      renderPipeline();
+    });
+    sliderOpacity.addEventListener('input', (e) => {
+      valOpacity.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    sliderReflection.addEventListener('input', (e) => {
+      valReflection.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    sliderInpaint.addEventListener('input', (e) => {
+      valInpaint.textContent = `${e.target.value}%`;
+      renderPipeline();
+    });
+    if (sliderEmeraldGlow) {
+      sliderEmeraldGlow.addEventListener('input', (e) => {
+        valEmeraldGlow.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+
+    // Unit Position & Scale Event Listeners
+    if (sliderUnitOffsetX) {
+      sliderUnitOffsetX.addEventListener('input', (e) => {
+        valUnitOffsetX.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+    if (sliderUnitOffsetY) {
+      sliderUnitOffsetY.addEventListener('input', (e) => {
+        valUnitOffsetY.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+    if (sliderUnitScale) {
+      sliderUnitScale.addEventListener('input', (e) => {
+        valUnitScale.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+
+    // 4-Way D-Pad Nudge Function for 1-Tap Mobile/Desktop Control
+    function nudgeUnit(dx, dy) {
+      if (dx !== 0 && sliderUnitOffsetX) {
+        let val = parseInt(sliderUnitOffsetX.value, 10) + dx;
+        val = Math.max(-30, Math.min(30, val));
+        sliderUnitOffsetX.value = val;
+        valUnitOffsetX.textContent = `${val}%`;
+      }
+      if (dy !== 0 && sliderUnitOffsetY) {
+        let val = parseInt(sliderUnitOffsetY.value, 10) + dy;
+        val = Math.max(-30, Math.min(30, val));
+        sliderUnitOffsetY.value = val;
+        valUnitOffsetY.textContent = `${val}%`;
+      }
+      renderPipeline();
+    }
+
+    if (btnUnitLeft) btnUnitLeft.addEventListener('click', () => nudgeUnit(-2, 0));
+    if (btnUnitRight) btnUnitRight.addEventListener('click', () => nudgeUnit(2, 0));
+    if (btnUnitUp) btnUnitUp.addEventListener('click', () => nudgeUnit(0, -2));
+    if (btnUnitDown) btnUnitDown.addEventListener('click', () => nudgeUnit(0, 2));
+
+    if (btnResetUnitPos) {
+      btnResetUnitPos.addEventListener('click', () => {
+        if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; valUnitOffsetX.textContent = '0%'; }
+        if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; valUnitOffsetY.textContent = '0%'; }
+        if (sliderUnitScale) { sliderUnitScale.value = 44; valUnitScale.textContent = '44%'; }
+        renderPipeline();
+      });
+    }
+
+    function applyReferencePreset() {
+      inputReading.value = '000812';
+      inputUnit.value = 'kWh';
+      if (checkFixedSlots) checkFixedSlots.checked = true;
+      previewReading.textContent = '000812';
+      previewUnit.textContent = 'kWh';
+
+      if (sliderEmeraldGlow) {
+        sliderEmeraldGlow.value = 0;
+        valEmeraldGlow.textContent = '0%';
+      }
+      sliderSlant.value = 7;
+      valSlant.textContent = '7°';
+
+      sliderGhost.value = 6;
+      valGhost.textContent = '6%';
+
+      sliderDust.value = 25;
+      valDust.textContent = '25%';
+
+      sliderTextSize.value = 72;
+      valTextSize.textContent = '72%';
+
+      sliderOffsetX.value = 0;
+      valOffsetX.textContent = '0%';
+
+      sliderOffsetY.value = 0;
+      valOffsetY.textContent = '0%';
+
+      if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; valUnitOffsetX.textContent = '0%'; }
+      if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; valUnitOffsetY.textContent = '0%'; }
+      if (sliderUnitScale) { sliderUnitScale.value = 44; valUnitScale.textContent = '44%'; }
+
+      sliderBlur.value = 6;
+      valBlur.textContent = '0.6 px';
+
+      sliderOpacity.value = 92;
+      valOpacity.textContent = '92%';
+
+      sliderReflection.value = 25;
+      valReflection.textContent = '25%';
+
+      sliderInpaint.value = 35;
+      valInpaint.textContent = '35%';
+
+      renderPipeline();
+    }
+
+    if (btnApplyReferencePreset) {
+      btnApplyReferencePreset.addEventListener('click', applyReferencePreset);
+    }
+
+    inputReading.addEventListener('input', (e) => {
+      previewReading.textContent = e.target.value || '';
+      renderPipeline();
+    });
+
+    inputUnit.addEventListener('input', (e) => {
+      previewUnit.textContent = e.target.value || '';
+      renderPipeline();
+    });
+
+    // Vector 7-Segment Digit Segment Map (Fallback & Precise Segment Drawing)
+    const SEVEN_SEG_MAP = {
+      '0': [1, 1, 1, 1, 1, 1, 0],
+      '1': [0, 1, 1, 0, 0, 0, 0],
+      '2': [1, 1, 0, 1, 1, 0, 1],
+      '3': [1, 1, 1, 1, 0, 0, 1],
+      '4': [0, 1, 1, 0, 0, 1, 1],
+      '5': [1, 0, 1, 1, 0, 1, 1],
+      '6': [1, 0, 1, 1, 1, 1, 1],
+      '7': [1, 1, 1, 0, 0, 0, 0],
+      '8': [1, 1, 1, 1, 1, 1, 1],
+      '9': [1, 1, 1, 1, 0, 1, 1],
+      '-': [0, 0, 0, 0, 0, 0, 1],
+      ' ': [0, 0, 0, 0, 0, 0, 0]
+    };
+
+    /**
+     * Helper to fill a polygon
+     */
+    function fillPoly(ctx, pts, color) {
+      if (!pts || pts.length < 3) return;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i][0], pts[i][1]);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    /**
+     * Renders bold, continuous, authentic 7-segment LCD digits with forward italic slant.
+     * Segments are solid bars with clean hairline 45-degree corner bevels.
+     */
+    function drawAuthenticLCDDigit(ctx, char, x, y, w, h, color, slantDeg) {
+      if (!color) return;
+      const slantRad = ((slantDeg !== undefined ? slantDeg : 7) * Math.PI) / 180;
+
+      ctx.save();
+      // Translate to bottom-left so italic shear pivots from the baseline
+      ctx.translate(x, y + h);
+      ctx.transform(1, 0, -Math.tan(slantRad), 1, 0, 0);
+
+      // Local coordinate space: yTop = -h, yBot = 0, xLeft = 0, xRight = w
+      const y0 = -h;
+
+      if (char === '.') {
+        const dotSize = Math.max(w * 0.45, 4);
+        const dotX = (w - dotSize) / 2;
+        ctx.fillStyle = color;
+        ctx.fillRect(dotX, -dotSize - h * 0.04, dotSize, dotSize);
+        ctx.restore();
+        return;
+      }
+
+      if (char === ':') {
+        const dotSize = Math.max(w * 0.4, 4);
+        const dotX = (w - dotSize) / 2;
+        ctx.fillStyle = color;
+        ctx.fillRect(dotX, y0 + h * 0.28, dotSize, dotSize);
+        ctx.fillRect(dotX, y0 + h * 0.68, dotSize, dotSize);
+        ctx.restore();
+        return;
+      }
+
+      // Proportions for authentic meter segments matching reference photo
+      const t = Math.max(w * 0.175, Math.max(h * 0.095, 3.2)); // authentic slender segment thickness
+      const s = Math.max(h * 0.012, 1.0);                      // hairline separation gap (1.0px)
+      const c = t * 0.36;                                      // 45-degree corner bevel chamfer
+      const hh = (h - 3 * t - 4 * s) / 2;                      // height of vertical segments
+
+      const yMidTop = y0 + t + 2 * s + hh;
+      const yMidBot = yMidTop + t;
+      const yMidCenter = yMidTop + t * 0.5;
+
+      // Segment A: Top horizontal bar
+      const segA = [
+        [s, y0],
+        [w - s, y0],
+        [w - s - c, y0 + t],
+        [s + c, y0 + t]
+      ];
+
+      // For '1', center the vertical bar horizontally inside the cell for balanced, harmonious spacing
+      let xRight = w;
+      let xLeft = w - t;
+      if (char === '1') {
+        xLeft = (w - t) / 2;
+        xRight = xLeft + t;
+      }
+
+      // Segment B: Top-right vertical bar (or centered for '1')
+      const segB = [
+        [xLeft, y0 + t + s + c],
+        [xRight, y0 + t + s],
+        [xRight, y0 + t + s + hh],
+        [xLeft, y0 + t + s + hh - c]
+      ];
+
+      // Segment C: Bottom-right vertical bar (or centered for '1')
+      const segC = [
+        [xLeft, yMidBot + s + c],
+        [xRight, yMidBot + s],
+        [xRight, -t - s],
+        [xLeft, -t - s - c]
+      ];
+
+      // Segment D: Bottom horizontal bar
+      const segD = [
+        [s + c, -t],
+        [w - s - c, -t],
+        [w - s, 0],
+        [s, 0]
+      ];
+
+      // Segment E: Bottom-left vertical bar
+      const segE = [
+        [0, yMidBot + s],
+        [t, yMidBot + s + c],
+        [t, -t - s - c],
+        [0, -t - s]
+      ];
+
+      // Segment F: Top-left vertical bar
+      const segF = [
+        [0, y0 + t + s],
+        [t, y0 + t + s + c],
+        [t, y0 + t + s + hh - c],
+        [0, y0 + t + s + hh]
+      ];
+
+      // Segment G: Middle horizontal pointed hexagonal bar
+      const segG = [
+        [s, yMidCenter],
+        [s + c, yMidTop],
+        [w - s - c, yMidTop],
+        [w - s, yMidCenter],
+        [w - s - c, yMidBot],
+        [s + c, yMidBot]
+      ];
+
+      const allSegs = [segA, segB, segC, segD, segE, segF, segG];
+      const activeSegs = SEVEN_SEG_MAP[char] || SEVEN_SEG_MAP[' '];
+
+      for (let i = 0; i < 7; i++) {
+        if (activeSegs[i]) {
+          fillPoly(ctx, allSegs[i], color);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    /**
+     * Renders text string (digits + unit) onto an un-tilted rectangular offscreen canvas
+     * Uses dual-pass 888888 ghost substrate layer for authentic liquid crystal inactive segments.
+     */
+    function renderUnTiltedTextLayer(targetW, targetH) {
+      const textCanvas = document.createElement('canvas');
+      textCanvas.width = targetW;
+      textCanvas.height = targetH;
+      const tCtx = textCanvas.getContext('2d');
+
+      let rawReading = inputReading.value.trim() || '000812';
+      const unit = inputUnit.value.trim();
+
+      // Auto-pad to 6 digits if Fixed 6-Digit Meter layout is enabled
+      let reading = rawReading;
+      if (checkFixedSlots && checkFixedSlots.checked) {
+        const cleanDigits = rawReading.replace(/[^0-9]/g, '');
+        if (cleanDigits.length > 0 && cleanDigits.length < 6) {
+          reading = cleanDigits.padStart(6, '0');
+        }
+      }
+
+      const scalePercent = parseInt(sliderTextSize.value, 10) / 100;
+      const offXPercent = parseInt(sliderOffsetX.value, 10) / 100;
+      const offYPercent = parseInt(sliderOffsetY.value, 10) / 100;
+      const opacity = parseInt(sliderOpacity.value, 10) / 100;
+      const ghostOpacity = parseInt(sliderGhost.value, 10) / 100;
+      const slantDeg = parseFloat(sliderSlant.value);
+
+      // Authentic LCD deep moss-forest tone matching reference meter photo
+      const digitColor = `rgba(20, 50, 24, ${opacity})`;
+      const ghostColor = ghostOpacity > 0 ? `rgba(26, 68, 30, ${ghostOpacity})` : null;
+      const unitColor = `rgba(22, 54, 26, ${Math.min(opacity + 0.05, 1.0)})`;
+
+      const digitHeight = Math.max(targetH * scalePercent, 18);
+      const digitWidth = digitHeight * 0.53; // authentic physical LCD aspect ratio
+      const charSpacing = digitWidth * 0.22; // authentic digit pitch matching reference photo
+
+      // Calculate total width of digits
+      let totalDigitsW = 0;
+      for (let i = 0; i < reading.length; i++) {
+        const c = reading[i];
+        if (c === '.' || c === ':') {
+          totalDigitsW += digitWidth * 0.35 + charSpacing;
+        } else {
+          totalDigitsW += digitWidth + charSpacing;
+        }
+      }
+
+      // Unit font size matching reference meter stamp (controlled independently by sliderUnitScale)
+      // Scaled directly against screen height (targetH) so changing Digit Size NEVER alters kWh font size
+      const unitScaleVal = sliderUnitScale ? parseInt(sliderUnitScale.value, 10) : 44;
+      const unitScalePercent = unitScaleVal / 100;
+      const unitFontSize = Math.max(Math.round(targetH * (unitScalePercent * 0.70)), 10);
+      tCtx.font = `bold ${unitFontSize}px "Segoe UI", Arial, sans-serif`;
+
+      // Digits starting position: centered strictly based on digits width and fixed meter layout zone.
+      // Completely decoupled from unit width and unit size: resizing kWh will NEVER shift the digits!
+      const digitsNetW = totalDigitsW > 0 ? (totalDigitsW - charSpacing) : 0;
+      const defaultUnitReserve = targetW * 0.16;
+      const startX = (targetW - (digitsNetW + defaultUnitReserve)) / 2 + (targetW * offXPercent);
+      const startY = (targetH - digitHeight) / 2 + (targetH * offYPercent);
+
+      // Pass 1: Render All Digit Slots with Ghost '8' Pattern (inactive liquid crystal substrate)
+      if (ghostColor) {
+        let gx = startX;
+        for (let i = 0; i < reading.length; i++) {
+          const c = reading[i];
+          const w = (c === '.' || c === ':') ? (digitWidth * 0.35) : digitWidth;
+          if (c !== '.' && c !== ':') {
+            drawAuthenticLCDDigit(tCtx, '8', gx, startY, w, digitHeight, ghostColor, slantDeg);
+          }
+          gx += w + charSpacing;
+        }
+      }
+
+      // Pass 2: Render the Active Digits in Bold Moss-Olive
+      let currX = startX;
+      for (let i = 0; i < reading.length; i++) {
+        const c = reading[i];
+        const w = (c === '.' || c === ':') ? (digitWidth * 0.35) : digitWidth;
+        drawAuthenticLCDDigit(tCtx, c, currX, startY, w, digitHeight, digitColor, slantDeg);
+        currX += w + charSpacing;
+      }
+
+      // Render Unit Suffix with 100% independent Left, Right, Up, Down positioning and scaling
+      if (unit) {
+        const unitBaseX = startX + totalDigitsW + (digitWidth * 0.35);
+        const unitOffXPercent = sliderUnitOffsetX ? (parseInt(sliderUnitOffsetX.value, 10) / 100) : 0;
+        const unitOffYPercent = sliderUnitOffsetY ? (parseInt(sliderUnitOffsetY.value, 10) / 100) : 0;
+
+        const unitFinalX = unitBaseX + (targetW * unitOffXPercent);
+        const unitFinalY = startY + digitHeight + (targetH * unitOffYPercent);
+
+        tCtx.save();
+        tCtx.fillStyle = unitColor;
+        tCtx.textBaseline = 'bottom';
+        // Apply slight slant to unit to match meter glass etching
+        const slantRad = (slantDeg * Math.PI) / 180;
+        tCtx.translate(unitFinalX, unitFinalY);
+        tCtx.transform(1, 0, -Math.tan(slantRad * 0.7), 1, 0, 0);
+        tCtx.fillText(unit, 0, 0);
+        tCtx.restore();
+      }
+
+      return textCanvas;
+    }
+
+    /**
+     * Selective Dark-Pixel Inpainter & Emerald Backlight Illuminator:
+     * Erases dark old numbers and infuses authentic glowing emerald LCD backlight
+     * matching the user reference photo with 1:1 fidelity and seamless edge feathering.
+     */
+    function reconstructBacklight(srcCanvas, pts, targetW, targetH, inpaintStrength, emeraldGlow = 0.85) {
+      const bgCanvas = document.createElement('canvas');
+      bgCanvas.width = targetW;
+      bgCanvas.height = targetH;
+      const bCtx = bgCanvas.getContext('2d');
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = imgWidth;
+      tempCanvas.height = imgHeight;
+      const sCtx = tempCanvas.getContext('2d');
+      sCtx.drawImage(srcCanvas, 0, 0);
+
+      const origImgData = sCtx.getImageData(0, 0, imgWidth, imgHeight).data;
+
+      // Find true green screen color by sampling interior points of the quad
+      function getQuadInteriorPoint(u, v) {
+        const x = (1 - u) * (1 - v) * pts[0].x + u * (1 - v) * pts[1].x + u * v * pts[2].x + (1 - u) * v * pts[3].x;
+        const y = (1 - u) * (1 - v) * pts[0].y + u * (1 - v) * pts[1].y + u * v * pts[2].y + (1 - u) * v * pts[3].y;
+        const sx = Math.max(0, Math.min(imgWidth - 1, Math.round(x)));
+        const sy = Math.max(0, Math.min(imgHeight - 1, Math.round(y)));
+        const idx = (sy * imgWidth + sx) * 4;
+        return [origImgData[idx], origImgData[idx + 1], origImgData[idx + 2]];
+      }
+
+      // Sample along top and bottom clear margins inside screen
+      const samples = [
+        getQuadInteriorPoint(0.25, 0.15),
+        getQuadInteriorPoint(0.50, 0.15),
+        getQuadInteriorPoint(0.75, 0.15),
+        getQuadInteriorPoint(0.25, 0.85),
+        getQuadInteriorPoint(0.50, 0.85),
+        getQuadInteriorPoint(0.75, 0.85)
+      ];
+
+      // Pick sample with best natural green balance
+      let bestGreen = samples[0];
+      let bestScore = -1;
+      for (const s of samples) {
+        const score = s[1] * 1.5 - s[0] - s[2];
+        if (score > bestScore) {
+          bestScore = score;
+          bestGreen = s;
+        }
+      }
+
+      const cTL = bestGreen;
+      const cTR = bestGreen;
+      const cBR = bestGreen;
+      const cBL = bestGreen;
+
+      const imgData = bCtx.createImageData(targetW, targetH);
+      const data = imgData.data;
+
+      // Crisp 2.5px edge anti-aliasing (no wide foggy feather wash!)
+      const featherX = 2.5;
+      const featherY = 2.5;
+
+      for (let y = 0; y < targetH; y++) {
+        for (let x = 0; x < targetW; x++) {
+          const u = x / (targetW - 1 || 1);
+          const v = y / (targetH - 1 || 1);
+
+          // Map (x, y) back to original photo pixel coordinates
+          const px = Math.round((1 - u) * (1 - v) * pts[0].x + u * (1 - v) * pts[1].x + u * v * pts[2].x + (1 - u) * v * pts[3].x);
+          const py = Math.round((1 - u) * (1 - v) * pts[0].y + u * (1 - v) * pts[1].y + u * v * pts[2].y + (1 - u) * v * pts[3].y);
+
+          const oX = Math.max(0, Math.min(imgWidth - 1, px));
+          const oY = Math.max(0, Math.min(imgHeight - 1, py));
+          const oIdx = (oY * imgWidth + oX) * 4;
+
+          const origR = origImgData[oIdx];
+          const origG = origImgData[oIdx + 1];
+          const origB = origImgData[oIdx + 2];
+
+          // Calculate luminance of the original pixel
+          const lum = 0.299 * origR + 0.587 * origG + 0.114 * origB;
+
+          // 1. Inpaint dark pixels (erasing old numbers) using clean sampled green backlight
+          let inpaintR = origR;
+          let inpaintG = origG;
+          let inpaintB = origB;
+          let darkMask = 0;
+
+          if (lum < 95) {
+            darkMask = Math.min(1.0, (95 - lum) / 25);
+            inpaintR = Math.round(origR * (1 - darkMask) + bestGreen[0] * darkMask);
+            inpaintG = Math.round(origG * (1 - darkMask) + bestGreen[1] * darkMask);
+            inpaintB = Math.round(origB * (1 - darkMask) + bestGreen[2] * darkMask);
+          }
+
+          // 2. Photographic Color Grade towards Reference Emerald Backlight
+          // Preserves 100% of camera grain, surface scratches, reflections, and glass bezels!
+          let finalR = inpaintR;
+          let finalG = inpaintG;
+          let finalB = inpaintB;
+
+          if (emeraldGlow > 0) {
+            // Reference emerald profile (deep saturated moss/forest emerald: R~48, G~118, B~65)
+            const refR = Math.min(inpaintR, Math.round(inpaintR * 0.45 + 10));
+            const refG = Math.round(Math.min(255, inpaintG * 1.06 + 14));
+            const refB = Math.min(inpaintB, Math.round(inpaintB * 0.60 + 12));
+
+            finalR = Math.round(inpaintR * (1 - emeraldGlow) + refR * emeraldGlow);
+            finalG = Math.round(inpaintG * (1 - emeraldGlow) + refG * emeraldGlow);
+            finalB = Math.round(inpaintB * (1 - emeraldGlow) + refB * emeraldGlow);
+          }
+
+          // Crisp 2.5px edge anti-aliasing
+          const distLeft = x;
+          const distRight = targetW - 1 - x;
+          const distTop = y;
+          const distBottom = targetH - 1 - y;
+
+          let edgeAlpha = Math.min(distLeft / featherX, distRight / featherX, distTop / featherY, distBottom / featherY);
+          if (edgeAlpha > 1.0) edgeAlpha = 1.0;
+          if (edgeAlpha < 0.0) edgeAlpha = 0.0;
+          edgeAlpha = edgeAlpha * edgeAlpha * (3 - 2 * edgeAlpha);
+
+          // Inpaint only dark old numbers, leaving the natural camera photo screen completely untouched!
+          // If user specifically boosts emeraldGlow, it applies a subtle tint without harsh box edges
+          const totalFillAlpha = Math.max(darkMask * inpaintStrength, emeraldGlow * 0.25);
+
+          const idx = (y * targetW + x) * 4;
+          data[idx] = finalR;
+          data[idx + 1] = finalG;
+          data[idx + 2] = finalB;
+          data[idx + 3] = Math.round(255 * totalFillAlpha * edgeAlpha);
+        }
+      }
+
+      bCtx.putImageData(imgData, 0, 0);
+      return bgCanvas;
+    }
+
+    /**
+     * Perspective Quad Mesh Warper
+     * Warps a source rectangular canvas onto an arbitrary quad [TL, TR, BR, BL] using Canvas 2D
+     * Subdivides into a 16x16 triangle grid for mathematically exact perspective warping!
+     */
+    function warpTextureToQuad(destCtx, srcCanvas, quad) {
+      const gridSteps = 16;
+      const srcW = srcCanvas.width;
+      const srcH = srcCanvas.height;
+
+      // Bilinear interpolation on quad corners
+      function getQuadPoint(u, v) {
+        const x = (1 - u) * (1 - v) * quad[0].x + u * (1 - v) * quad[1].x + u * v * quad[2].x + (1 - u) * v * quad[3].x;
+        const y = (1 - u) * (1 - v) * quad[0].y + u * (1 - v) * quad[1].y + u * v * quad[2].y + (1 - u) * v * quad[3].y;
+        return { x, y };
+      }
+
+      for (let gy = 0; gy < gridSteps; gy++) {
+        const v0 = gy / gridSteps;
+        const v1 = (gy + 1) / gridSteps;
+        const sy0 = v0 * srcH;
+        const sy1 = v1 * srcH;
+
+        for (let gx = 0; gx < gridSteps; gx++) {
+          const u0 = gx / gridSteps;
+          const u1 = (gx + 1) / gridSteps;
+          const sx0 = u0 * srcW;
+          const sx1 = u1 * srcW;
+
+          const p00 = getQuadPoint(u0, v0);
+          const p10 = getQuadPoint(u1, v0);
+          const p11 = getQuadPoint(u1, v1);
+          const p01 = getQuadPoint(u0, v1);
+
+          // Triangle 1: p00, p10, p01
+          renderTriangle(destCtx, srcCanvas,
+            sx0, sy0, sx1, sy0, sx0, sy1,
+            p00.x, p00.y, p10.x, p10.y, p01.x, p01.y
+          );
+
+          // Triangle 2: p10, p11, p01
+          renderTriangle(destCtx, srcCanvas,
+            sx1, sy0, sx1, sy1, sx0, sy1,
+            p10.x, p10.y, p11.x, p11.y, p01.x, p01.y
+          );
+        }
+      }
+    }
+
+    /**
+     * Affine Triangle Texture Mapper
+     */
+    function renderTriangle(ctx, im, x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(u0, v0);
+      ctx.lineTo(u1, v1);
+      ctx.lineTo(u2, v2);
+      ctx.closePath();
+      ctx.clip();
+
+      // Compute Affine Transform matrix mapping (x, y) -> (u, v)
+      const delta = x0 * (y1 - y2) - x1 * (y0 - y2) + x2 * (y0 - y1);
+      if (Math.abs(delta) < 1e-6) {
+        ctx.restore();
+        return;
+      }
+
+      const a = -(y0 * (u1 - u2) - y1 * (u0 - u2) + y2 * (u0 - u1)) / delta;
+      const b = (x0 * (u1 - u2) - x1 * (u0 - u2) + x2 * (u0 - u1)) / delta;
+      const c = (x0 * (y1 * u2 - y2 * u1) - x1 * (y0 * u2 - y2 * u0) + x2 * (y0 * u1 - y1 * u0)) / delta;
+
+      const d = -(y0 * (v1 - v2) - y1 * (v0 - v2) + y2 * (v0 - v1)) / delta;
+      const e = (x0 * (v1 - v2) - x1 * (v0 - v2) + x2 * (v0 - v1)) / delta;
+      const f = (x0 * (y1 * v2 - y2 * v1) - x1 * (y0 * v2 - y2 * v0) + x2 * (y0 * v1 - y1 * v0)) / delta;
+
+      ctx.transform(a, d, b, e, c, f);
+      ctx.drawImage(im, 0, 0);
+      ctx.restore();
+    }
+
+    /**
+     * Master Compositing Pipeline
+     * Combines background inpainting, text rendering, tilt warping, lens softness, and glass reflections.
+     */
+    function renderPipeline(drawHandles = true) {
+      if (!sourceImage) return;
+
+      // 1. Draw base original photo
+      ctx.clearRect(0, 0, imgWidth, imgHeight);
+      ctx.drawImage(sourceImage, 0, 0);
+
+      // Estimate rectified width and height based on quad edge lengths
+      const topW = Math.hypot(quadPoints[1].x - quadPoints[0].x, quadPoints[1].y - quadPoints[0].y);
+      const botW = Math.hypot(quadPoints[2].x - quadPoints[3].x, quadPoints[2].y - quadPoints[3].y);
+      const leftH = Math.hypot(quadPoints[3].x - quadPoints[0].x, quadPoints[3].y - quadPoints[0].y);
+      const rightH = Math.hypot(quadPoints[2].x - quadPoints[1].x, quadPoints[2].y - quadPoints[1].y);
+
+      const rectW = Math.max(Math.round(Math.max(topW, botW)), 100);
+      const rectH = Math.max(Math.round(Math.max(leftH, rightH)), 50);
+
+      // 2. Reconstruct Inpainted Backlight Gradient & Authentic Emerald Glow
+      const inpaintStrength = parseInt(sliderInpaint.value, 10) / 100;
+      const emeraldGlow = sliderEmeraldGlow ? (parseInt(sliderEmeraldGlow.value, 10) / 100) : 0.85;
+      const backlightCanvas = reconstructBacklight(sourceImage, quadPoints, rectW, rectH, inpaintStrength, emeraldGlow);
+
+      // 3. Render 7-Segment Digits + Unit Suffix
+      const textCanvas = renderUnTiltedTextLayer(rectW, rectH);
+
+      // 4. Create Un-tilted Rectified Screen Composite
+      const screenCompositeCanvas = document.createElement('canvas');
+      screenCompositeCanvas.width = rectW;
+      screenCompositeCanvas.height = rectH;
+      const scCtx = screenCompositeCanvas.getContext('2d');
+
+      // Draw inpainted backlight
+      scCtx.drawImage(backlightCanvas, 0, 0);
+
+      // Draw text with Camera Lens Softness (Gaussian Blur)
+      const blurVal = (parseInt(sliderBlur.value, 10) / 10);
+      if (blurVal > 0) {
+        scCtx.filter = `blur(${blurVal}px)`;
+      } else {
+        scCtx.filter = 'none';
+      }
+      scCtx.drawImage(textCanvas, 0, 0);
+      scCtx.filter = 'none';
+
+      // 5. Warp the Screen Composite onto the Quad using 16x16 Perspective Transform
+      warpTextureToQuad(ctx, screenCompositeCanvas, quadPoints);
+
+      // 6. Blend Original Glass Reflections & Glare Back Over the Digits
+      const reflectionStrength = parseInt(sliderReflection.value, 10) / 100;
+      if (reflectionStrength > 0) {
+        ctx.save();
+        // Clip to the screen quad so reflections don't spill outside
+        ctx.beginPath();
+        ctx.moveTo(quadPoints[0].x, quadPoints[0].y);
+        ctx.lineTo(quadPoints[1].x, quadPoints[1].y);
+        ctx.lineTo(quadPoints[2].x, quadPoints[2].y);
+        ctx.lineTo(quadPoints[3].x, quadPoints[3].y);
+        ctx.closePath();
+        ctx.clip();
+
+        // Extract ONLY true specular white highlights/glare (lum > 180) so screen is never washed out
+        const hlCanvas = document.createElement('canvas');
+        hlCanvas.width = imgWidth;
+        hlCanvas.height = imgHeight;
+        const hlCtx = hlCanvas.getContext('2d');
+        hlCtx.drawImage(sourceImage, 0, 0);
+
+        const hlData = hlCtx.getImageData(0, 0, imgWidth, imgHeight);
+        const d = hlData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          // Only true bright reflections pass through; green screen is left 100% transparent
+          if (lum > 180) {
+            d[i + 3] = Math.round(Math.min(1.0, (lum - 180) / 60) * 255);
+          } else {
+            d[i + 3] = 0;
+          }
+        }
+        hlCtx.putImageData(hlData, 0, 0);
+
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = reflectionStrength;
+        ctx.drawImage(hlCanvas, 0, 0);
+
+        ctx.restore();
+      }
+
+      // 7. Surface Dust & Micro-Scuffs Layer (Weathered meter screen realism)
+      const dustStrength = parseInt(sliderDust.value, 10) / 100;
+      if (dustStrength > 0) {
+        drawSurfaceDustAndScuffs(ctx, quadPoints, dustStrength);
+      }
+
+      // 8. Draw Interactive Corner Handles (if editing)
+      if (drawHandles) {
+        drawQuadHandles();
+      }
+    }
+
+    /**
+     * Renders authentic surface micro-scratches, dust particles, and scuffs
+     * matching the aged plastic meter cover in the reference photo.
+     */
+    function drawSurfaceDustAndScuffs(destCtx, quad, intensity) {
+      destCtx.save();
+      destCtx.beginPath();
+      destCtx.moveTo(quad[0].x, quad[0].y);
+      destCtx.lineTo(quad[1].x, quad[1].y);
+      destCtx.lineTo(quad[2].x, quad[2].y);
+      destCtx.lineTo(quad[3].x, quad[3].y);
+      destCtx.closePath();
+      destCtx.clip();
+
+      // Deterministic PRNG using fixed seed for stable dust positions
+      let seed = 42819;
+      function rnd() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      }
+
+      const minX = Math.min(quad[0].x, quad[1].x, quad[2].x, quad[3].x);
+      const maxX = Math.max(quad[0].x, quad[1].x, quad[2].x, quad[3].x);
+      const minY = Math.min(quad[0].y, quad[1].y, quad[2].y, quad[3].y);
+      const maxY = Math.max(quad[0].y, quad[1].y, quad[2].y, quad[3].y);
+      const qw = maxX - minX;
+      const qh = maxY - minY;
+
+      // 1. Draw tiny white & translucent dust specks
+      const numSpecks = Math.round(90 * intensity);
+      for (let i = 0; i < numSpecks; i++) {
+        const px = minX + rnd() * qw;
+        const py = minY + rnd() * qh;
+        const radius = 0.5 + rnd() * 1.5;
+        const isWhite = rnd() > 0.35;
+        destCtx.beginPath();
+        destCtx.arc(px, py, radius, 0, Math.PI * 2);
+        if (isWhite) {
+          destCtx.fillStyle = `rgba(255, 255, 255, ${(0.15 + rnd() * 0.35) * intensity})`;
+        } else {
+          // Dark micro-dirt speck
+          destCtx.fillStyle = `rgba(35, 45, 30, ${(0.2 + rnd() * 0.4) * intensity})`;
+        }
+        destCtx.fill();
+      }
+
+      // 2. Draw subtle hairline micro-scratches
+      const numScratches = Math.round(18 * intensity);
+      destCtx.lineWidth = Math.max(0.75 / displayScale, 0.6);
+      for (let i = 0; i < numScratches; i++) {
+        const sx = minX + rnd() * qw;
+        const sy = minY + rnd() * qh;
+        const len = (10 + rnd() * 45);
+        const angle = rnd() * Math.PI * 2;
+        const ex = sx + Math.cos(angle) * len;
+        const ey = sy + Math.sin(angle) * len;
+
+        destCtx.beginPath();
+        destCtx.moveTo(sx, sy);
+        destCtx.lineTo(ex, ey);
+        destCtx.strokeStyle = `rgba(255, 255, 255, ${(0.08 + rnd() * 0.18) * intensity})`;
+        destCtx.stroke();
+      }
+
+      destCtx.restore();
+    }
+
+    /**
+     * Draws interactive handles on the canvas for user alignment
+     */
+    function drawQuadHandles() {
+      // Completely remove rectangular box and handles if hidden
+      if (!showSelectionBox) return;
+      // Auto-hide handles while user is adjusting sliders or typing
+      if (isInteractingWithControls) return;
+
+      const effectiveScale = displayScale * currentZoom;
+      const radius = Math.max(7 / effectiveScale, 4.5);
+      const lineWidth = Math.max(1.8 / effectiveScale, 1.2);
+
+      ctx.save();
+
+      // Draw Polygon Border ONLY if explicitly enabled
+      if (checkShowDashedLine && checkShowDashedLine.checked) {
+        ctx.beginPath();
+        ctx.moveTo(quadPoints[0].x, quadPoints[0].y);
+        for (let i = 1; i < 4; i++) {
+          ctx.lineTo(quadPoints[i].x, quadPoints[i].y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.75)';
+        ctx.lineWidth = lineWidth;
+        ctx.setLineDash([5 / effectiveScale, 4 / effectiveScale]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // Draw Sleek, Non-Obtrusive Corner Handles
+      quadPoints.forEach((pt, idx) => {
+        const isHover = (activePointIndex === idx);
+
+        // Subtle outer halo
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, radius * 1.5, 0, 2 * Math.PI);
+        ctx.fillStyle = isHover ? 'rgba(245, 158, 11, 0.25)' : 'rgba(16, 185, 129, 0.2)';
+        ctx.fill();
+
+        // Semi-transparent center ring
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = isHover ? '#f59e0b' : 'rgba(16, 185, 129, 0.85)';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+
+        // Center pin dot
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, radius * 0.35, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // Label: TL/TR ABOVE corner, BL/BR BELOW corner
+        // This guarantees text NEVER covers the numbers inside the LCD screen!
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${Math.max(11 / effectiveScale, 9)}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+        ctx.shadowBlur = 4 / effectiveScale;
+
+        const isTop = (idx === 0 || idx === 1);
+        const labelY = isTop ? (pt.y - radius * 1.6) : (pt.y + radius * 1.6);
+        ctx.fillText(pt.name, pt.x, labelY);
+        ctx.shadowBlur = 0;
+      });
+
+      ctx.restore();
+    }
+
+    // Interactive Dragging & Touch Coordinates Conversion
+    function getCanvasCoords(event) {
+      const rect = mainCanvas.getBoundingClientRect();
+      const touch = (event.touches && event.touches.length > 0) ? event.touches[0] : (event.changedTouches && event.changedTouches.length > 0 ? event.changedTouches[0] : event);
+      const clientX = touch.clientX;
+      const clientY = touch.clientY;
+
+      const scaleX = rect.width / (imgWidth || 1);
+      const scaleY = rect.height / (imgHeight || 1);
+      const x = (clientX - rect.left) / (scaleX || displayScale || 1);
+      const y = (clientY - rect.top) / (scaleY || displayScale || 1);
+      return { x, y, clientX, clientY };
+    }
+
+    function findClosestCorner(x, y) {
+      const threshold = 35 / displayScale;
+      let minIdx = -1;
+      let minDist = Infinity;
+
+      quadPoints.forEach((pt, idx) => {
+        const d = Math.hypot(pt.x - x, pt.y - y);
+        if (d < minDist && d < threshold) {
+          minDist = d;
+          minIdx = idx;
+        }
+      });
+      return minIdx;
+    }
+
+    // Pointer / Mouse / Touch Events for Dragging Corners and Panning
+    function onPointerDown(e) {
+      const { x, y, clientX, clientY } = getCanvasCoords(e);
+      const idx = findClosestCorner(x, y);
+
+      if (idx !== -1) {
+        activePointIndex = idx;
+        isDragging = true;
+        if (canvasWrapper) canvasWrapper.classList.add('is-dragging-corner');
+        updateMagnifier(clientX, clientY, quadPoints[idx]);
+        renderPipeline(true);
+      } else {
+        // Start smooth pan
+        isPanning = true;
+        panStartX = clientX - currentPanX;
+        panStartY = clientY - currentPanY;
+        if (canvasWrapper) canvasWrapper.classList.add('is-panning');
+      }
+    }
+
+    function onPointerMove(e) {
+      const { x, y, clientX, clientY } = getCanvasCoords(e);
+
+      if (isDragging && activePointIndex !== -1) {
+        quadPoints[activePointIndex].x = Math.max(0, Math.min(imgWidth, x));
+        quadPoints[activePointIndex].y = Math.max(0, Math.min(imgHeight, y));
+
+        updateMagnifier(clientX, clientY, quadPoints[activePointIndex]);
+        renderPipeline(true);
+      } else if (isPanning) {
+        currentPanX = clientX - panStartX;
+        currentPanY = clientY - panStartY;
+        applyCanvasTransform(false);
+      } else {
+        const hoverIdx = findClosestCorner(x, y);
+        mainCanvas.style.cursor = (hoverIdx !== -1) ? 'grab' : (currentZoom > 1.05 ? 'grab' : 'crosshair');
+      }
+    }
+
+    function onPointerUp() {
+      if (isDragging) {
+        isDragging = false;
+        activePointIndex = -1;
+        magnifier.style.display = 'none';
+        if (canvasWrapper) canvasWrapper.classList.remove('is-dragging-corner');
+        renderPipeline(true);
+      }
+      if (isPanning) {
+        isPanning = false;
+        if (canvasWrapper) canvasWrapper.classList.remove('is-panning');
+      }
+    }
+
+    // Loupe Magnifier to accurately position corners with touch or mouse
+    function updateMagnifier(clientX, clientY, pt) {
+      magnifier.style.display = 'block';
+      const magW = 120;
+      const magH = 120;
+      let top = clientY - 140;
+      let left = clientX - (magW / 2);
+
+      // If too close to top edge, flip magnifier below finger
+      if (top < 10) {
+        top = clientY + 40;
+      }
+      // Keep magnifier within horizontal window bounds
+      left = Math.max(10, Math.min(window.innerWidth - magW - 10, left));
+
+      magnifier.style.left = `${Math.round(left)}px`;
+      magnifier.style.top = `${Math.round(top)}px`;
+
+      magCtx.clearRect(0, 0, 120, 120);
+      const zoom = 2.5;
+      const sw = 120 / zoom;
+      const sh = 120 / zoom;
+      const sx = pt.x - sw / 2;
+      const sy = pt.y - sh / 2;
+
+      magCtx.drawImage(sourceImage, sx, sy, sw, sh, 0, 0, 120, 120);
+
+      // Draw crosshair
+      magCtx.strokeStyle = '#10b981';
+      magCtx.lineWidth = 1.5;
+      magCtx.beginPath();
+      magCtx.moveTo(60, 0); magCtx.lineTo(60, 120);
+      magCtx.moveTo(0, 60); magCtx.lineTo(120, 60);
+      magCtx.stroke();
+    }
+
+    // Mouse Events
+    mainCanvas.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    // Touch Gestures: 1-finger for Corners/Pan, 2-fingers for Pinch-to-Zoom & Pan
+    let touchMode = 'none';
+    let initialDist = 0;
+    let initialZoom = 1.0;
+    let initialPanX = 0;
+    let initialPanY = 0;
+    let touchStartCenter = { x: 0, y: 0 };
+
+    const viewportEl = document.getElementById('viewport');
+    if (viewportEl) {
+      viewportEl.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          touchMode = 'pinch_pan';
+          isDragging = false;
+          isPanning = false;
+          activePointIndex = -1;
+          if (magnifier) magnifier.style.display = 'none';
+
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          initialDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          initialZoom = currentZoom;
+          initialPanX = currentPanX;
+          initialPanY = currentPanY;
+          touchStartCenter = {
+            x: (t1.clientX + t2.clientX) / 2,
+            y: (t1.clientY + t2.clientY) / 2
+          };
+        }
+      }, { passive: false });
+
+      viewportEl.addEventListener('touchmove', (e) => {
+        if (touchMode === 'pinch_pan' && e.touches.length === 2) {
+          e.preventDefault();
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          const center = {
+            x: (t1.clientX + t2.clientX) / 2,
+            y: (t1.clientY + t2.clientY) / 2
+          };
+
+          if (initialDist > 0) {
+            const scaleDelta = dist / initialDist;
+            currentZoom = Math.max(0.7, Math.min(initialZoom * scaleDelta, 9.0));
+          }
+
+          currentPanX = initialPanX + (center.x - touchStartCenter.x);
+          currentPanY = initialPanY + (center.y - touchStartCenter.y);
+          isFocusLcd = false;
+          applyCanvasTransform(false);
+        }
+      }, { passive: false });
+
+      viewportEl.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2 && touchMode === 'pinch_pan') {
+          touchMode = 'none';
+        }
+      });
+
+      viewportEl.addEventListener('wheel', (e) => {
+        if (!sourceImage) return;
+        e.preventDefault();
+        const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+        currentZoom = Math.max(0.7, Math.min(currentZoom * zoomFactor, 9.0));
+        isFocusLcd = false;
+        applyCanvasTransform(false);
+      }, { passive: false });
+    }
+
+    mainCanvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1 && touchMode !== 'pinch_pan') {
+        e.preventDefault();
+        onPointerDown(e);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if ((isDragging || isPanning) && touchMode !== 'pinch_pan') {
+        e.preventDefault();
+        onPointerMove(e);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      if (touchMode !== 'pinch_pan') {
+        onPointerUp();
+      }
+    });
+
+    // Toolbar Buttons Wiring
+    const btnFocusLCD = document.getElementById('btnFocusLCD');
+    const btnToggleHandlesFloat = document.getElementById('btnToggleHandlesFloat');
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnResetZoom = document.getElementById('btnResetZoom');
+
+    if (btnFocusLCD) btnFocusLCD.addEventListener('click', toggleFocusLcd);
+    if (btnToggleHandlesFloat) btnToggleHandlesFloat.addEventListener('click', toggleSelectionBox);
+    if (btnZoomIn) btnZoomIn.addEventListener('click', () => {
+      currentZoom = Math.min(currentZoom * 1.25, 9.0);
+      isFocusLcd = false;
+      applyCanvasTransform(true);
+    });
+    if (btnZoomOut) btnZoomOut.addEventListener('click', () => {
+      currentZoom = Math.max(currentZoom * 0.8, 0.7);
+      isFocusLcd = false;
+      applyCanvasTransform(true);
+    });
+    if (btnResetZoom) btnResetZoom.addEventListener('click', () => resetCanvasView(true));
+
+    // Auto-hide handles when user is interacting with any controls in the sidebar
+    document.querySelectorAll('.sidebar input[type="range"], .sidebar input[type="text"]').forEach(input => {
+      input.addEventListener('input', notifyControlInteraction);
+      input.addEventListener('touchstart', notifyControlInteraction, { passive: true });
+    });
+    document.querySelectorAll('.sidebar button').forEach(btn => {
+      btn.addEventListener('click', notifyControlInteraction);
+    });
+
+    // Download High-Resolution Composite Image (Without corner handles)
+    btnDownload.addEventListener('click', () => {
+      if (!sourceImage) return;
+
+      renderPipeline(false);
+
+      const link = document.createElement('a');
+      link.download = `synthetic_lcd_${inputReading.value.trim().replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+      link.href = mainCanvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+
+      renderPipeline(true);
+    });
+
+    // Toggle Selection Box & Guides
+    function toggleSelectionBox() {
+      showSelectionBox = !showSelectionBox;
+      const label = showSelectionBox ? "👁️ Hide Box" : "👁️ Show Box";
+      if (btnToggleBox) btnToggleBox.innerHTML = label;
+      if (btnSideToggleBox) btnSideToggleBox.innerHTML = label;
+      const statusBadge = document.getElementById('quadStatus');
+      if (statusBadge) {
+        statusBadge.textContent = showSelectionBox ? "Guides Visible" : "Guides Hidden";
+      }
+      if (btnToggleHandlesFloat) {
+        const textSpan = btnToggleHandlesFloat.querySelector('.tool-text');
+        if (textSpan) textSpan.textContent = showSelectionBox ? 'Handles' : 'Hidden';
+        if (showSelectionBox) {
+          btnToggleHandlesFloat.classList.remove('active-focus');
+        } else {
+          btnToggleHandlesFloat.classList.add('active-focus');
+        }
+      }
+      renderPipeline(true);
+    }
+
+    if (btnToggleBox) btnToggleBox.addEventListener('click', toggleSelectionBox);
+    if (btnSideToggleBox) btnSideToggleBox.addEventListener('click', toggleSelectionBox);
+    if (checkShowDashedLine) checkShowDashedLine.addEventListener('change', () => renderPipeline(true));
+
+    // Keyboard Shortcuts:
+    // 'H' to quickly toggle/remove the corner box
+    // 'F' to toggle Focus LCD Screen / Full View
+    // '+' or '=' to Zoom In, '-' to Zoom Out, '0' to Reset Zoom
+    // Shift + Arrow Keys to nudge Unit (kWh) Left, Right, Up, Down
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'h' || e.key === 'H') {
+        toggleSelectionBox();
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        toggleFocusLcd();
+      }
+      if (e.key === '+' || e.key === '=') {
+        currentZoom = Math.min(currentZoom * 1.25, 9.0);
+        isFocusLcd = false;
+        applyCanvasTransform(true);
+      }
+      if (e.key === '-' || e.key === '_') {
+        currentZoom = Math.max(currentZoom * 0.8, 0.7);
+        isFocusLcd = false;
+        applyCanvasTransform(true);
+      }
+      if (e.key === '0') {
+        resetCanvasView(true);
+      }
+      if (e.shiftKey) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); nudgeUnit(-1, 0); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nudgeUnit(1, 0); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); nudgeUnit(0, -1); }
+        if (e.key === 'ArrowDown') { e.preventDefault(); nudgeUnit(0, 1); }
+      }
+    });
+
+  </script>
+</body>
+
+</html>
