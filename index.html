@@ -627,8 +627,7 @@
         gap: 3px;
       }
 
-      #btnHeaderAutoDetect,
-      #btnToggleBox {
+      #btnHeaderAutoDetect {
         display: none !important;
       }
 
@@ -984,9 +983,6 @@
         title="Automatically detect the rectangular LCD screen">
         ⚡ Auto-Detect Screen
       </button>
-      <button class="btn btn-secondary" id="btnToggleBox" title="Toggle Selection Box and Corner Handles (Shortcut: H)">
-        👁️ Hide Box
-      </button>
       <button class="btn btn-secondary" id="btnUploadTrigger" title="Open Photo">
         📁 <span class="btn-text-full">Open Photo</span><span class="btn-text-short">Open</span>
       </button>
@@ -1035,10 +1031,6 @@
           <span class="tool-icon">🎯</span>
           <span class="tool-text">Focus LCD</span>
         </button>
-        <button id="btnToggleHandlesFloat" class="viewport-tool-btn" title="Toggle Corner Handles / Guides (Shortcut: H)">
-          <span class="tool-icon">👁️</span>
-          <span class="tool-text">Handles</span>
-        </button>
         <div class="viewport-zoom-group">
           <button id="btnZoomOut" class="viewport-tool-btn btn-sm" title="Zoom Out (−)">−</button>
           <span id="zoomPercentLabel" class="zoom-percent">100%</span>
@@ -1062,34 +1054,14 @@
           <span class="badge" id="quadStatus">4 Points Ready</span>
         </div>
 
-        <div class="step-card">
-          <div class="step-num">1</div>
-          <div class="step-text">
-            Tap <strong>"Auto-Detect Screen"</strong> to snap corners instantly. Drag handles (TL, TR, BR, BL) if you
-            need micro-tuning.
-          </div>
-        </div>
-
         <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
           <button class="btn btn-primary" id="btnAutoDetect"
             style="flex: 1 1 100%; font-size: 0.88rem; background: linear-gradient(135deg, #2563eb, #3b82f6); justify-content: center; font-weight: 600; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
             ⚡ Auto-Detect Screen
           </button>
-          <button class="btn btn-secondary" id="btnSideToggleBox" style="flex: 1; font-size: 0.85rem;">
-            👁️ Hide Box
-          </button>
           <button class="btn btn-secondary" id="btnResetCorners" style="flex: 1; font-size: 0.85rem;">
             🔄 Reset
           </button>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 0;">
-          <label
-            style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted); user-select: none;">
-            <input type="checkbox" id="checkShowDashedLine"
-              style="accent-color: var(--accent); width: 16px; height: 16px;">
-            <span>Show dashed rectangular box outline</span>
-          </label>
         </div>
       </div>
 
@@ -1178,6 +1150,63 @@
         </div>
       </div>
 
+
+      <!-- Digit Position & Cropping -->
+      <div class="panel-section">
+        <div class="section-title">
+          <span>Digit Position &amp; Cropping</span>
+          <button id="btnResetDigitPos" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem; text-transform: none;" title="Reset digit position and crop">↺ Reset</button>
+        </div>
+
+        <!-- Quick 4-Way D-Pad Nudge Buttons for Digits -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+          <button id="btnDigitLeft" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Left">⬅️ Left</button>
+          <button id="btnDigitRight" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Right">➡️ Right</button>
+          <button id="btnDigitUp" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Up">⬆️ Up</button>
+          <button id="btnDigitDown" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Down">⬇️ Down</button>
+        </div>
+
+        <!-- Digit Horizontal Position -->
+        <div class="form-group" style="margin-bottom: 8px;">
+          <div class="form-label">
+            <span>Digit Horizontal (Left / Right)</span>
+            <span class="form-val" id="valDigitOffsetX">0%</span>
+          </div>
+          <input type="range" id="sliderDigitOffsetX" class="slider" min="-40" max="40" value="0">
+        </div>
+
+        <!-- Digit Vertical Position -->
+        <div class="form-group" style="margin-bottom: 8px;">
+          <div class="form-label">
+            <span>Digit Vertical (Up / Down)</span>
+            <span class="form-val" id="valDigitOffsetY">0%</span>
+          </div>
+          <input type="range" id="sliderDigitOffsetY" class="slider" min="-40" max="40" value="0">
+        </div>
+
+        <!-- Digit Crop Zoom -->
+        <div class="form-group" style="margin-bottom: 8px;">
+          <div class="form-label">
+            <span>Digit Crop Zoom</span>
+            <span class="form-val" id="valDigitCropZoom">100%</span>
+          </div>
+          <input type="range" id="sliderDigitCropZoom" class="slider" min="100" max="300" value="100">
+        </div>
+
+        <!-- Digit Angle / Rotation (Tilt) -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <div class="form-label">
+            <span>Digit Angle / Tilt</span>
+            <span class="form-val" id="valDigitAngle">0.0°</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="btnDigitTiltCCW" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; white-space: nowrap;" title="Rotate Counter-Clockwise 0.5°">↺ -0.5°</button>
+            <input type="range" id="sliderDigitAngle" class="slider" min="-15" max="15" step="0.5" value="0" style="flex: 1;">
+            <button id="btnDigitTiltCW" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; white-space: nowrap;" title="Rotate Clockwise 0.5°">↻ +0.5°</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Photorealistic Sliders -->
       <div class="panel-section">
         <div class="section-title">
@@ -1235,23 +1264,7 @@
           <input type="range" id="sliderTextSize" class="slider" min="20" max="95" value="72">
         </div>
 
-        <!-- Position Offset X -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>Horizontal Offset (X)</span>
-            <span class="form-val" id="valOffsetX">0%</span>
-          </div>
-          <input type="range" id="sliderOffsetX" class="slider" min="-40" max="40" value="0">
-        </div>
 
-        <!-- Position Offset Y -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>Vertical Offset (Y)</span>
-            <span class="form-val" id="valOffsetY">0%</span>
-          </div>
-          <input type="range" id="sliderOffsetY" class="slider" min="-40" max="40" value="0">
-        </div>
 
         <!-- Lens Softness (Gaussian Blur) -->
         <div class="form-group">
@@ -1328,7 +1341,7 @@
     let controlInteractionTimer = null;
 
     // Selection Box & Guides State
-    let showSelectionBox = true;
+    let showSelectionBox = false; // Box UI removed
 
     // DOM Elements
     const fileInput = document.getElementById('fileInput');
@@ -1336,11 +1349,8 @@
     const btnUploadTrigger = document.getElementById('btnUploadTrigger');
     const btnDownload = document.getElementById('btnDownload');
     const btnResetCorners = document.getElementById('btnResetCorners');
-    const btnToggleBox = document.getElementById('btnToggleBox');
-    const btnSideToggleBox = document.getElementById('btnSideToggleBox');
     const btnAutoDetect = document.getElementById('btnAutoDetect');
     const btnHeaderAutoDetect = document.getElementById('btnHeaderAutoDetect');
-    const checkShowDashedLine = document.getElementById('checkShowDashedLine');
     const canvasWrapper = document.getElementById('canvasWrapper');
     const mainCanvas = document.getElementById('mainCanvas');
     const ctx = mainCanvas.getContext('2d', { willReadFrequently: true });
@@ -1368,10 +1378,6 @@
 
     const sliderTextSize = document.getElementById('sliderTextSize');
     const valTextSize = document.getElementById('valTextSize');
-    const sliderOffsetX = document.getElementById('sliderOffsetX');
-    const valOffsetX = document.getElementById('valOffsetX');
-    const sliderOffsetY = document.getElementById('sliderOffsetY');
-    const valOffsetY = document.getElementById('valOffsetY');
     const sliderBlur = document.getElementById('sliderBlur');
     const valBlur = document.getElementById('valBlur');
     const sliderOpacity = document.getElementById('sliderOpacity');
@@ -1396,6 +1402,23 @@
     const btnUnitUp = document.getElementById('btnUnitUp');
     const btnUnitDown = document.getElementById('btnUnitDown');
     const btnResetUnitPos = document.getElementById('btnResetUnitPos');
+    // Digit Position & Crop Controls
+    const sliderDigitOffsetX = document.getElementById('sliderDigitOffsetX');
+    const valDigitOffsetX = document.getElementById('valDigitOffsetX');
+    const sliderDigitOffsetY = document.getElementById('sliderDigitOffsetY');
+    const valDigitOffsetY = document.getElementById('valDigitOffsetY');
+    const sliderDigitCropZoom = document.getElementById('sliderDigitCropZoom');
+    const valDigitCropZoom = document.getElementById('valDigitCropZoom');
+    const btnDigitLeft = document.getElementById('btnDigitLeft');
+    const btnDigitRight = document.getElementById('btnDigitRight');
+    const btnDigitUp = document.getElementById('btnDigitUp');
+    const btnDigitDown = document.getElementById('btnDigitDown');
+    const btnResetDigitPos = document.getElementById('btnResetDigitPos');
+    const sliderDigitAngle = document.getElementById('sliderDigitAngle');
+    const valDigitAngle = document.getElementById('valDigitAngle');
+    const btnDigitTiltCCW = document.getElementById('btnDigitTiltCCW');
+    const btnDigitTiltCW = document.getElementById('btnDigitTiltCW');
+
 
     // Attach File Upload Event Listeners
     uploadOverlay.addEventListener('click', () => fileInput.click());
@@ -1869,14 +1892,6 @@
       valTextSize.textContent = `${e.target.value}%`;
       renderPipeline();
     });
-    sliderOffsetX.addEventListener('input', (e) => {
-      valOffsetX.textContent = `${e.target.value}%`;
-      renderPipeline();
-    });
-    sliderOffsetY.addEventListener('input', (e) => {
-      valOffsetY.textContent = `${e.target.value}%`;
-      renderPipeline();
-    });
     sliderBlur.addEventListener('input', (e) => {
       valBlur.textContent = `${(e.target.value / 10).toFixed(1)} px`;
       renderPipeline();
@@ -1974,15 +1989,14 @@
       sliderTextSize.value = 72;
       valTextSize.textContent = '72%';
 
-      sliderOffsetX.value = 0;
-      valOffsetX.textContent = '0%';
-
-      sliderOffsetY.value = 0;
-      valOffsetY.textContent = '0%';
 
       if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; valUnitOffsetX.textContent = '0%'; }
       if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; valUnitOffsetY.textContent = '0%'; }
       if (sliderUnitScale) { sliderUnitScale.value = 44; valUnitScale.textContent = '44%'; }
+      if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; valDigitOffsetX.textContent = '0%'; }
+      if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; valDigitOffsetY.textContent = '0%'; }
+      if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; valDigitCropZoom.textContent = '100%'; }
+      if (sliderDigitAngle) { sliderDigitAngle.value = 0; valDigitAngle.textContent = '0.0°'; }
 
       sliderBlur.value = 6;
       valBlur.textContent = '0.6 px';
@@ -2001,6 +2015,78 @@
 
     if (btnApplyReferencePreset) {
       btnApplyReferencePreset.addEventListener('click', applyReferencePreset);
+    }
+
+    // ===== Digit Position & Crop Controls =====
+    if (sliderDigitOffsetX) {
+      sliderDigitOffsetX.addEventListener('input', (e) => {
+        valDigitOffsetX.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+    if (sliderDigitOffsetY) {
+      sliderDigitOffsetY.addEventListener('input', (e) => {
+        valDigitOffsetY.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+    if (sliderDigitCropZoom) {
+      sliderDigitCropZoom.addEventListener('input', (e) => {
+        valDigitCropZoom.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+    if (sliderDigitAngle) {
+      sliderDigitAngle.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        valDigitAngle.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}°`;
+        renderPipeline();
+      });
+    }
+
+    function nudgeAngle(delta) {
+      if (sliderDigitAngle) {
+        let val = parseFloat(sliderDigitAngle.value) + delta;
+        val = Math.max(-15, Math.min(15, Math.round(val * 10) / 10));
+        sliderDigitAngle.value = val;
+        valDigitAngle.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}°`;
+        renderPipeline();
+      }
+    }
+
+    if (btnDigitTiltCCW) btnDigitTiltCCW.addEventListener('click', () => nudgeAngle(-0.5));
+    if (btnDigitTiltCW) btnDigitTiltCW.addEventListener('click', () => nudgeAngle(0.5));
+
+    // Digit 4-Way D-Pad Nudge
+    function nudgeDigit(dx, dy) {
+      if (dx !== 0 && sliderDigitOffsetX) {
+        let val = parseInt(sliderDigitOffsetX.value, 10) + dx;
+        val = Math.max(-40, Math.min(40, val));
+        sliderDigitOffsetX.value = val;
+        valDigitOffsetX.textContent = `${val}%`;
+      }
+      if (dy !== 0 && sliderDigitOffsetY) {
+        let val = parseInt(sliderDigitOffsetY.value, 10) + dy;
+        val = Math.max(-40, Math.min(40, val));
+        sliderDigitOffsetY.value = val;
+        valDigitOffsetY.textContent = `${val}%`;
+      }
+      renderPipeline();
+    }
+
+    if (btnDigitLeft) btnDigitLeft.addEventListener('click', () => nudgeDigit(-2, 0));
+    if (btnDigitRight) btnDigitRight.addEventListener('click', () => nudgeDigit(2, 0));
+    if (btnDigitUp) btnDigitUp.addEventListener('click', () => nudgeDigit(0, -2));
+    if (btnDigitDown) btnDigitDown.addEventListener('click', () => nudgeDigit(0, 2));
+
+    if (btnResetDigitPos) {
+      btnResetDigitPos.addEventListener('click', () => {
+        if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; valDigitOffsetX.textContent = '0%'; }
+        if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; valDigitOffsetY.textContent = '0%'; }
+        if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; valDigitCropZoom.textContent = '100%'; }
+        if (sliderDigitAngle) { sliderDigitAngle.value = 0; valDigitAngle.textContent = '0.0°'; }
+        renderPipeline();
+      });
     }
 
     inputReading.addEventListener('input', (e) => {
@@ -2190,8 +2276,10 @@
       }
 
       const scalePercent = parseInt(sliderTextSize.value, 10) / 100;
-      const offXPercent = parseInt(sliderOffsetX.value, 10) / 100;
-      const offYPercent = parseInt(sliderOffsetY.value, 10) / 100;
+      // Digit-specific position offsets and crop zoom
+      const digitOffXPercent = sliderDigitOffsetX ? (parseInt(sliderDigitOffsetX.value, 10) / 100) : 0;
+      const digitOffYPercent = sliderDigitOffsetY ? (parseInt(sliderDigitOffsetY.value, 10) / 100) : 0;
+      const cropZoom = sliderDigitCropZoom ? (parseInt(sliderDigitCropZoom.value, 10) / 100) : 1.0;
       const opacity = parseInt(sliderOpacity.value, 10) / 100;
       const ghostOpacity = parseInt(sliderGhost.value, 10) / 100;
       const slantDeg = parseFloat(sliderSlant.value);
@@ -2201,7 +2289,7 @@
       const ghostColor = ghostOpacity > 0 ? `rgba(26, 68, 30, ${ghostOpacity})` : null;
       const unitColor = `rgba(22, 54, 26, ${Math.min(opacity + 0.05, 1.0)})`;
 
-      const digitHeight = Math.max(targetH * scalePercent, 18);
+      const digitHeight = Math.max(targetH * scalePercent * cropZoom, 18);
       const digitWidth = digitHeight * 0.53; // authentic physical LCD aspect ratio
       const charSpacing = digitWidth * 0.22; // authentic digit pitch matching reference photo
 
@@ -2227,8 +2315,21 @@
       // Completely decoupled from unit width and unit size: resizing kWh will NEVER shift the digits!
       const digitsNetW = totalDigitsW > 0 ? (totalDigitsW - charSpacing) : 0;
       const defaultUnitReserve = targetW * 0.16;
-      const startX = (targetW - (digitsNetW + defaultUnitReserve)) / 2 + (targetW * offXPercent);
-      const startY = (targetH - digitHeight) / 2 + (targetH * offYPercent);
+      const startX = (targetW - (digitsNetW + defaultUnitReserve)) / 2 + (targetW * digitOffXPercent);
+      const startY = (targetH - digitHeight) / 2 + (targetH * digitOffYPercent);
+
+      // Digit Angle / Rotation: Rotate entire text layer (digits + unit) smoothly around digits visual center
+      const digitAngleDeg = sliderDigitAngle ? parseFloat(sliderDigitAngle.value) : 0;
+      const hasRotation = Math.abs(digitAngleDeg) > 0.001;
+      if (hasRotation) {
+        const centerX = startX + digitsNetW / 2;
+        const centerY = startY + digitHeight / 2;
+        const angleRad = (digitAngleDeg * Math.PI) / 180;
+        tCtx.save();
+        tCtx.translate(centerX, centerY);
+        tCtx.rotate(angleRad);
+        tCtx.translate(-centerX, -centerY);
+      }
 
       // Pass 1: Render All Digit Slots with Ghost '8' Pattern (inactive liquid crystal substrate)
       if (ghostColor) {
@@ -2269,6 +2370,10 @@
         tCtx.translate(unitFinalX, unitFinalY);
         tCtx.transform(1, 0, -Math.tan(slantRad * 0.7), 1, 0, 0);
         tCtx.fillText(unit, 0, 0);
+        tCtx.restore();
+      }
+
+      if (hasRotation) {
         tCtx.restore();
       }
 
@@ -2769,50 +2874,25 @@
     // Pointer / Mouse / Touch Events for Dragging Corners and Panning
     function onPointerDown(e) {
       const { x, y, clientX, clientY } = getCanvasCoords(e);
-      const idx = findClosestCorner(x, y);
-
-      if (idx !== -1) {
-        activePointIndex = idx;
-        isDragging = true;
-        if (canvasWrapper) canvasWrapper.classList.add('is-dragging-corner');
-        updateMagnifier(clientX, clientY, quadPoints[idx]);
-        renderPipeline(true);
-      } else {
-        // Start smooth pan
-        isPanning = true;
-        panStartX = clientX - currentPanX;
-        panStartY = clientY - currentPanY;
-        if (canvasWrapper) canvasWrapper.classList.add('is-panning');
-      }
+      // Pan only (corner dragging removed — use auto-detect + sliders)
+      isPanning = true;
+      panStartX = clientX - currentPanX;
+      panStartY = clientY - currentPanY;
+      if (canvasWrapper) canvasWrapper.classList.add('is-panning');
     }
 
     function onPointerMove(e) {
       const { x, y, clientX, clientY } = getCanvasCoords(e);
-
-      if (isDragging && activePointIndex !== -1) {
-        quadPoints[activePointIndex].x = Math.max(0, Math.min(imgWidth, x));
-        quadPoints[activePointIndex].y = Math.max(0, Math.min(imgHeight, y));
-
-        updateMagnifier(clientX, clientY, quadPoints[activePointIndex]);
-        renderPipeline(true);
-      } else if (isPanning) {
+      if (isPanning) {
         currentPanX = clientX - panStartX;
         currentPanY = clientY - panStartY;
         applyCanvasTransform(false);
       } else {
-        const hoverIdx = findClosestCorner(x, y);
-        mainCanvas.style.cursor = (hoverIdx !== -1) ? 'grab' : (currentZoom > 1.05 ? 'grab' : 'crosshair');
+        mainCanvas.style.cursor = currentZoom > 1.05 ? 'grab' : 'default';
       }
     }
 
     function onPointerUp() {
-      if (isDragging) {
-        isDragging = false;
-        activePointIndex = -1;
-        magnifier.style.display = 'none';
-        if (canvasWrapper) canvasWrapper.classList.remove('is-dragging-corner');
-        renderPipeline(true);
-      }
       if (isPanning) {
         isPanning = false;
         if (canvasWrapper) canvasWrapper.classList.remove('is-panning');
@@ -2953,13 +3033,12 @@
 
     // Toolbar Buttons Wiring
     const btnFocusLCD = document.getElementById('btnFocusLCD');
-    const btnToggleHandlesFloat = document.getElementById('btnToggleHandlesFloat');
     const btnZoomIn = document.getElementById('btnZoomIn');
     const btnZoomOut = document.getElementById('btnZoomOut');
     const btnResetZoom = document.getElementById('btnResetZoom');
 
     if (btnFocusLCD) btnFocusLCD.addEventListener('click', toggleFocusLcd);
-    if (btnToggleHandlesFloat) btnToggleHandlesFloat.addEventListener('click', toggleSelectionBox);
+    // btnToggleHandlesFloat listener removed
     if (btnZoomIn) btnZoomIn.addEventListener('click', () => {
       currentZoom = Math.min(currentZoom * 1.25, 9.0);
       isFocusLcd = false;
@@ -2995,31 +3074,10 @@
       renderPipeline(true);
     });
 
-    // Toggle Selection Box & Guides
-    function toggleSelectionBox() {
-      showSelectionBox = !showSelectionBox;
-      const label = showSelectionBox ? "👁️ Hide Box" : "👁️ Show Box";
-      if (btnToggleBox) btnToggleBox.innerHTML = label;
-      if (btnSideToggleBox) btnSideToggleBox.innerHTML = label;
-      const statusBadge = document.getElementById('quadStatus');
-      if (statusBadge) {
-        statusBadge.textContent = showSelectionBox ? "Guides Visible" : "Guides Hidden";
-      }
-      if (btnToggleHandlesFloat) {
-        const textSpan = btnToggleHandlesFloat.querySelector('.tool-text');
-        if (textSpan) textSpan.textContent = showSelectionBox ? 'Handles' : 'Hidden';
-        if (showSelectionBox) {
-          btnToggleHandlesFloat.classList.remove('active-focus');
-        } else {
-          btnToggleHandlesFloat.classList.add('active-focus');
-        }
-      }
-      renderPipeline(true);
-    }
+    // Toggle Selection Box & Guides (disabled)
+    function toggleSelectionBox() { /* no-op */ }
 
-    if (btnToggleBox) btnToggleBox.addEventListener('click', toggleSelectionBox);
-    if (btnSideToggleBox) btnSideToggleBox.addEventListener('click', toggleSelectionBox);
-    if (checkShowDashedLine) checkShowDashedLine.addEventListener('change', () => renderPipeline(true));
+    // Box toggle listeners removed
 
     // Keyboard Shortcuts:
     // 'H' to quickly toggle/remove the corner box
@@ -3028,9 +3086,7 @@
     // Shift + Arrow Keys to nudge Unit (kWh) Left, Right, Up, Down
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (e.key === 'h' || e.key === 'H') {
-        toggleSelectionBox();
-      }
+      // 'H' shortcut removed (box feature disabled)
       if (e.key === 'f' || e.key === 'F') {
         toggleFocusLcd();
       }
@@ -3046,6 +3102,21 @@
       }
       if (e.key === '0') {
         resetCanvasView(true);
+      }
+      // Alt + Left/Right or [ / ] = nudge digit angle / tilt
+      if (e.altKey) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); nudgeAngle(-0.5); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nudgeAngle(0.5); }
+      }
+      if (e.key === '[' || e.key === '{') { e.preventDefault(); nudgeAngle(-0.5); }
+      if (e.key === ']' || e.key === '}') { e.preventDefault(); nudgeAngle(0.5); }
+
+      // Arrow Keys: plain = nudge digits, Shift = nudge unit
+      if (!e.shiftKey && !e.ctrlKey && !e.altKey) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); nudgeDigit(-1, 0); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); nudgeDigit(1, 0); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); nudgeDigit(0, -1); }
+        if (e.key === 'ArrowDown') { e.preventDefault(); nudgeDigit(0, 1); }
       }
       if (e.shiftKey) {
         if (e.key === 'ArrowLeft') { e.preventDefault(); nudgeUnit(-1, 0); }
