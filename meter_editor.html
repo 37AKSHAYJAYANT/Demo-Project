@@ -720,6 +720,8 @@
 
       .slider {
         height: 8px;
+        touch-action: pan-y;
+        margin: 6px 0;
       }
 
       .slider::-webkit-slider-thumb {
@@ -853,6 +855,7 @@
       -webkit-appearance: none;
       appearance: none;
       cursor: pointer;
+      touch-action: pan-y;
     }
 
     .slider::-webkit-slider-thumb {
@@ -1051,16 +1054,16 @@
       <div class="panel-section">
         <div class="section-title">
           <span>Screen Alignment</span>
-          <span class="badge" id="quadStatus">4 Points Ready</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge" id="quadStatus">4 Points Ready</span>
+            <button class="btn btn-secondary" id="btnResetCorners" style="padding: 2px 8px; font-size: 0.75rem; text-transform: none;" title="Reset 4 corners">↺ Reset</button>
+          </div>
         </div>
 
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+        <div>
           <button class="btn btn-primary" id="btnAutoDetect"
-            style="flex: 1 1 100%; font-size: 0.88rem; background: linear-gradient(135deg, #2563eb, #3b82f6); justify-content: center; font-weight: 600; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+            style="width: 100%; font-size: 0.88rem; padding: 10px 14px; background: linear-gradient(135deg, #2563eb, #3b82f6); justify-content: center; font-weight: 600; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); border-radius: 8px;">
             ⚡ Auto-Detect Screen
-          </button>
-          <button class="btn btn-secondary" id="btnResetCorners" style="flex: 1; font-size: 0.85rem;">
-            🔄 Reset
           </button>
         </div>
       </div>
@@ -1095,116 +1098,103 @@
             <span class="unit-preview" id="previewUnit">kWh</span>
           </div>
 
-          <!-- Unit (kWh) Position & Scale Controls (Left, Right, Up, Down) -->
-          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-size: 0.85rem; font-weight: 600; color: var(--accent);">Unit (kWh) Position &
-                Scale</span>
-              <button id="btnResetUnitPos" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem;"
-                title="Reset Unit position">↺ Reset</button>
-            </div>
-
-            <!-- Quick 4-Way D-Pad Nudge Buttons -->
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
-              <button id="btnUnitLeft" class="btn btn-secondary"
-                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Left">⬅️
-                Left</button>
-              <button id="btnUnitRight" class="btn btn-secondary"
-                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Right">➡️
-                Right</button>
-              <button id="btnUnitUp" class="btn btn-secondary"
-                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Up">⬆️
-                Up</button>
-              <button id="btnUnitDown" class="btn btn-secondary"
-                style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Unit Down">⬇️
-                Down</button>
-            </div>
-
-            <!-- Unit Horizontal Slider (Left / Right) -->
-            <div class="form-group" style="margin-bottom: 8px;">
-              <div class="form-label">
-                <span>Unit Horizontal (Left / Right)</span>
-                <span class="form-val" id="valUnitOffsetX">0%</span>
-              </div>
-              <input type="range" id="sliderUnitOffsetX" class="slider" min="-30" max="30" value="0">
-            </div>
-
-            <!-- Unit Vertical Slider (Up / Down) -->
-            <div class="form-group" style="margin-bottom: 8px;">
-              <div class="form-label">
-                <span>Unit Vertical (Up / Down)</span>
-                <span class="form-val" id="valUnitOffsetY">0%</span>
-              </div>
-              <input type="range" id="sliderUnitOffsetY" class="slider" min="-30" max="30" value="0">
-            </div>
-
-            <!-- Unit Scale / Size Slider -->
-            <div class="form-group" style="margin-bottom: 0;">
-              <div class="form-label">
-                <span>Unit Size</span>
-                <span class="form-val" id="valUnitScale">44%</span>
-              </div>
-              <input type="range" id="sliderUnitScale" class="slider" min="20" max="80" value="44">
-            </div>
-          </div>
-        </div>
+                  </div>
       </div>
 
-
-      <!-- Digit Position & Cropping -->
-      <div class="panel-section">
+      <!-- Position, Scale & Alignment -->
+      <div class="panel-section" id="panelPositionScale">
         <div class="section-title">
-          <span>Digit Position &amp; Cropping</span>
-          <button id="btnResetDigitPos" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem; text-transform: none;" title="Reset digit position and crop">↺ Reset</button>
+          <span>Position, Scale &amp; Alignment</span>
+          <button id="btnUnifiedReset" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.75rem; text-transform: none;" title="Reset active position &amp; scale">↺ Reset</button>
         </div>
 
-        <!-- Quick 4-Way D-Pad Nudge Buttons for Digits -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
-          <button id="btnDigitLeft" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Left">⬅️ Left</button>
-          <button id="btnDigitRight" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Right">➡️ Right</button>
-          <button id="btnDigitUp" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Up">⬆️ Up</button>
-          <button id="btnDigitDown" class="btn btn-secondary" style="padding: 6px 4px; font-size: 0.8rem; justify-content: center;" title="Nudge Digits Down">⬇️ Down</button>
-        </div>
-
-        <!-- Digit Horizontal Position -->
-        <div class="form-group" style="margin-bottom: 8px;">
-          <div class="form-label">
-            <span>Digit Horizontal (Left / Right)</span>
-            <span class="form-val" id="valDigitOffsetX">0%</span>
+        <!-- Target Selector: Radio / Tick Buttons with clear tap areas -->
+        <div style="background: rgba(15, 23, 42, 0.65); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 22px;">
+          <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; font-weight: 700;">Active Adjustment Target:</div>
+          <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: #e2e8f0; user-select: none; padding: 5px 9px; border-radius: 6px; background: rgba(255,255,255,0.05);">
+              <input type="radio" name="posTarget" value="digits" checked style="accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer;">
+              <span>🔢 Digits</span>
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: #e2e8f0; user-select: none; padding: 5px 9px; border-radius: 6px; background: rgba(255,255,255,0.05);">
+              <input type="radio" name="posTarget" value="unit" style="accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer;">
+              <span>⚡ Unit (kWh)</span>
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: #e2e8f0; user-select: none; padding: 5px 9px; border-radius: 6px; background: rgba(255,255,255,0.05);">
+              <input type="radio" name="posTarget" value="both" style="accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer;">
+              <span>🔗 Both (Link)</span>
+            </label>
           </div>
-          <input type="range" id="sliderDigitOffsetX" class="slider" min="-40" max="40" value="0">
         </div>
 
-        <!-- Digit Vertical Position -->
-        <div class="form-group" style="margin-bottom: 8px;">
-          <div class="form-label">
-            <span>Digit Vertical (Up / Down)</span>
-            <span class="form-val" id="valDigitOffsetY">0%</span>
+        <!-- Unified 4-Way D-Pad Nudge Buttons with mobile touch spacing -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px;">
+          <button id="btnUnifiedLeft" class="btn btn-secondary" style="padding: 10px 4px; font-size: 0.82rem; min-height: 40px; justify-content: center;" title="Nudge Active Left">⬅️ Left</button>
+          <button id="btnUnifiedRight" class="btn btn-secondary" style="padding: 10px 4px; font-size: 0.82rem; min-height: 40px; justify-content: center;" title="Nudge Active Right">➡️ Right</button>
+          <button id="btnUnifiedUp" class="btn btn-secondary" style="padding: 10px 4px; font-size: 0.82rem; min-height: 40px; justify-content: center;" title="Nudge Active Up">⬆️ Up</button>
+          <button id="btnUnifiedDown" class="btn btn-secondary" style="padding: 10px 4px; font-size: 0.82rem; min-height: 40px; justify-content: center;" title="Nudge Active Down">⬇️ Down</button>
+        </div>
+
+        <!-- Unified Horizontal Position Slider with generous scroll-safe margins -->
+        <div class="form-group" style="margin-bottom: 24px; padding: 0 2px;">
+          <div class="form-label" style="margin-bottom: 8px;">
+            <span id="lblUnifiedX">Digit Horizontal (Left / Right)</span>
+            <span class="form-val" id="valUnifiedX">0%</span>
           </div>
-          <input type="range" id="sliderDigitOffsetY" class="slider" min="-40" max="40" value="0">
+          <input type="range" id="sliderUnifiedX" class="slider" min="-40" max="40" value="0">
         </div>
 
-        <!-- Digit Crop Zoom -->
-        <div class="form-group" style="margin-bottom: 8px;">
-          <div class="form-label">
+        <!-- Unified Vertical Position Slider with generous scroll-safe margins -->
+        <div class="form-group" style="margin-bottom: 24px; padding: 0 2px;">
+          <div class="form-label" style="margin-bottom: 8px;">
+            <span id="lblUnifiedY">Digit Vertical (Up / Down)</span>
+            <span class="form-val" id="valUnifiedY">0%</span>
+          </div>
+          <input type="range" id="sliderUnifiedY" class="slider" min="-40" max="40" value="0">
+        </div>
+
+        <!-- Unified Size / Scale Slider with generous scroll-safe margins -->
+        <div class="form-group" style="margin-bottom: 26px; padding: 0 2px;">
+          <div class="form-label" style="margin-bottom: 8px;">
+            <span id="lblUnifiedScale">Digit Text Scale</span>
+            <span class="form-val" id="valUnifiedScale">72%</span>
+          </div>
+          <input type="range" id="sliderUnifiedScale" class="slider" min="20" max="95" value="72">
+        </div>
+
+        <!-- Digit Fine-Tuning: Crop Zoom -->
+        <div class="form-group" style="margin-bottom: 24px; margin-top: 10px; padding: 16px 2px 0 2px; border-top: 1px dashed var(--border-color);">
+          <div class="form-label" style="margin-bottom: 8px;">
             <span>Digit Crop Zoom</span>
             <span class="form-val" id="valDigitCropZoom">100%</span>
           </div>
           <input type="range" id="sliderDigitCropZoom" class="slider" min="100" max="300" value="100">
         </div>
 
-        <!-- Digit Angle / Rotation (Tilt) -->
-        <div class="form-group" style="margin-bottom: 0;">
-          <div class="form-label">
+        <!-- Digit Fine-Tuning: Angle / Tilt -->
+        <div class="form-group" style="margin-bottom: 8px; padding: 0 2px;">
+          <div class="form-label" style="margin-bottom: 8px;">
             <span>Digit Angle / Tilt</span>
             <span class="form-val" id="valDigitAngle">0.0°</span>
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <button id="btnDigitTiltCCW" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; white-space: nowrap;" title="Rotate Counter-Clockwise 0.5°">↺ -0.5°</button>
+            <button id="btnDigitTiltCCW" class="btn btn-secondary" style="padding: 6px 12px; min-height: 38px; font-size: 0.8rem; white-space: nowrap;" title="Rotate Counter-Clockwise 0.5°">↺ -0.5°</button>
             <input type="range" id="sliderDigitAngle" class="slider" min="-15" max="15" step="0.5" value="0" style="flex: 1;">
-            <button id="btnDigitTiltCW" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; white-space: nowrap;" title="Rotate Clockwise 0.5°">↻ +0.5°</button>
+            <button id="btnDigitTiltCW" class="btn btn-secondary" style="padding: 6px 12px; min-height: 38px; font-size: 0.8rem; white-space: nowrap;" title="Rotate Clockwise 0.5°">↻ +0.5°</button>
           </div>
         </div>
+
+        <!-- Preserved State Inputs (Synchronized with Unified Controls for Canvas Pipeline & Presets) -->
+        <input type="hidden" id="sliderDigitOffsetX" value="0">
+        <span id="valDigitOffsetX" style="display:none;">0%</span>
+        <input type="hidden" id="sliderDigitOffsetY" value="0">
+        <span id="valDigitOffsetY" style="display:none;">0%</span>
+        <input type="hidden" id="sliderUnitOffsetX" value="0">
+        <span id="valUnitOffsetX" style="display:none;">0%</span>
+        <input type="hidden" id="sliderUnitOffsetY" value="0">
+        <span id="valUnitOffsetY" style="display:none;">0%</span>
+        <input type="hidden" id="sliderUnitScale" value="44">
+        <span id="valUnitScale" style="display:none;">44%</span>
       </div>
 
       <!-- Photorealistic Sliders -->
@@ -1390,35 +1380,40 @@
     const sliderEmeraldGlow = document.getElementById('sliderEmeraldGlow');
     const valEmeraldGlow = document.getElementById('valEmeraldGlow');
 
-    // Unit Position & Scale Controls
+    // Unified Position & Scale Controls
+    const radioPosTargets = document.querySelectorAll('input[name="posTarget"]');
+    const btnUnifiedReset = document.getElementById('btnUnifiedReset');
+    const btnUnifiedLeft = document.getElementById('btnUnifiedLeft');
+    const btnUnifiedRight = document.getElementById('btnUnifiedRight');
+    const btnUnifiedUp = document.getElementById('btnUnifiedUp');
+    const btnUnifiedDown = document.getElementById('btnUnifiedDown');
+    const sliderUnifiedX = document.getElementById('sliderUnifiedX');
+    const valUnifiedX = document.getElementById('valUnifiedX');
+    const lblUnifiedX = document.getElementById('lblUnifiedX');
+    const sliderUnifiedY = document.getElementById('sliderUnifiedY');
+    const valUnifiedY = document.getElementById('valUnifiedY');
+    const lblUnifiedY = document.getElementById('lblUnifiedY');
+    const sliderUnifiedScale = document.getElementById('sliderUnifiedScale');
+    const valUnifiedScale = document.getElementById('valUnifiedScale');
+    const lblUnifiedScale = document.getElementById('lblUnifiedScale');
+
+    // Preserved references for pipeline rendering compatibility
     const sliderUnitOffsetX = document.getElementById('sliderUnitOffsetX');
     const valUnitOffsetX = document.getElementById('valUnitOffsetX');
     const sliderUnitOffsetY = document.getElementById('sliderUnitOffsetY');
     const valUnitOffsetY = document.getElementById('valUnitOffsetY');
     const sliderUnitScale = document.getElementById('sliderUnitScale');
     const valUnitScale = document.getElementById('valUnitScale');
-    const btnUnitLeft = document.getElementById('btnUnitLeft');
-    const btnUnitRight = document.getElementById('btnUnitRight');
-    const btnUnitUp = document.getElementById('btnUnitUp');
-    const btnUnitDown = document.getElementById('btnUnitDown');
-    const btnResetUnitPos = document.getElementById('btnResetUnitPos');
-    // Digit Position & Crop Controls
     const sliderDigitOffsetX = document.getElementById('sliderDigitOffsetX');
     const valDigitOffsetX = document.getElementById('valDigitOffsetX');
     const sliderDigitOffsetY = document.getElementById('sliderDigitOffsetY');
     const valDigitOffsetY = document.getElementById('valDigitOffsetY');
     const sliderDigitCropZoom = document.getElementById('sliderDigitCropZoom');
     const valDigitCropZoom = document.getElementById('valDigitCropZoom');
-    const btnDigitLeft = document.getElementById('btnDigitLeft');
-    const btnDigitRight = document.getElementById('btnDigitRight');
-    const btnDigitUp = document.getElementById('btnDigitUp');
-    const btnDigitDown = document.getElementById('btnDigitDown');
-    const btnResetDigitPos = document.getElementById('btnResetDigitPos');
     const sliderDigitAngle = document.getElementById('sliderDigitAngle');
     const valDigitAngle = document.getElementById('valDigitAngle');
     const btnDigitTiltCCW = document.getElementById('btnDigitTiltCCW');
     const btnDigitTiltCW = document.getElementById('btnDigitTiltCW');
-
 
     // Attach File Upload Event Listeners
     uploadOverlay.addEventListener('click', () => fileInput.click());
@@ -1890,6 +1885,15 @@
 
     sliderTextSize.addEventListener('input', (e) => {
       valTextSize.textContent = `${e.target.value}%`;
+      if (typeof getActiveTarget === 'function') {
+        const target = getActiveTarget();
+        if (target === 'digits' || target === 'both') {
+          if (typeof sliderUnifiedScale !== 'undefined' && sliderUnifiedScale) {
+            sliderUnifiedScale.value = e.target.value;
+            if (valUnifiedScale) valUnifiedScale.textContent = `${e.target.value}%`;
+          }
+        }
+      }
       renderPipeline();
     });
     sliderBlur.addEventListener('input', (e) => {
@@ -1915,57 +1919,296 @@
       });
     }
 
-    // Unit Position & Scale Event Listeners
-    if (sliderUnitOffsetX) {
-      sliderUnitOffsetX.addEventListener('input', (e) => {
-        valUnitOffsetX.textContent = `${e.target.value}%`;
-        renderPipeline();
-      });
+    // ==========================================
+    // Unified Position & Scale Manager
+    // ==========================================
+    let lastUnifiedX = 0;
+    let lastUnifiedY = 0;
+    let lastUnifiedScale = 72;
+
+    function getActiveTarget() {
+      const checkedRadio = document.querySelector('input[name="posTarget"]:checked');
+      return checkedRadio ? checkedRadio.value : 'digits';
     }
-    if (sliderUnitOffsetY) {
-      sliderUnitOffsetY.addEventListener('input', (e) => {
-        valUnitOffsetY.textContent = `${e.target.value}%`;
-        renderPipeline();
-      });
+
+    function updateUnifiedUIFromTarget() {
+      const target = getActiveTarget();
+      if (target === 'digits') {
+        if (lblUnifiedX) lblUnifiedX.textContent = 'Digit Horizontal (Left / Right)';
+        if (sliderUnifiedX && sliderDigitOffsetX) {
+          sliderUnifiedX.min = -40;
+          sliderUnifiedX.max = 40;
+          sliderUnifiedX.value = sliderDigitOffsetX.value || 0;
+          if (valUnifiedX) valUnifiedX.textContent = `${sliderUnifiedX.value}%`;
+        }
+        if (lblUnifiedY) lblUnifiedY.textContent = 'Digit Vertical (Up / Down)';
+        if (sliderUnifiedY && sliderDigitOffsetY) {
+          sliderUnifiedY.min = -40;
+          sliderUnifiedY.max = 40;
+          sliderUnifiedY.value = sliderDigitOffsetY.value || 0;
+          if (valUnifiedY) valUnifiedY.textContent = `${sliderUnifiedY.value}%`;
+        }
+        if (lblUnifiedScale) lblUnifiedScale.textContent = 'Digit Text Scale';
+        if (sliderUnifiedScale && sliderTextSize) {
+          sliderUnifiedScale.min = 20;
+          sliderUnifiedScale.max = 95;
+          sliderUnifiedScale.value = sliderTextSize.value || 72;
+          if (valUnifiedScale) valUnifiedScale.textContent = `${sliderUnifiedScale.value}%`;
+        }
+      } else if (target === 'unit') {
+        if (lblUnifiedX) lblUnifiedX.textContent = 'Unit (kWh) Horizontal (Left / Right)';
+        if (sliderUnifiedX && sliderUnitOffsetX) {
+          sliderUnifiedX.min = -40;
+          sliderUnifiedX.max = 40;
+          sliderUnifiedX.value = sliderUnitOffsetX.value || 0;
+          if (valUnifiedX) valUnifiedX.textContent = `${sliderUnitOffsetX.value}%`;
+        }
+        if (lblUnifiedY) lblUnifiedY.textContent = 'Unit (kWh) Vertical (Up / Down)';
+        if (sliderUnifiedY && sliderUnitOffsetY) {
+          sliderUnifiedY.min = -40;
+          sliderUnifiedY.max = 40;
+          sliderUnifiedY.value = sliderUnitOffsetY.value || 0;
+          if (valUnifiedY) valUnifiedY.textContent = `${sliderUnitOffsetY.value}%`;
+        }
+        if (lblUnifiedScale) lblUnifiedScale.textContent = 'Unit (kWh) Size';
+        if (sliderUnifiedScale && sliderUnitScale) {
+          sliderUnifiedScale.min = 20;
+          sliderUnifiedScale.max = 80;
+          sliderUnifiedScale.value = sliderUnitScale.value || 44;
+          if (valUnifiedScale) valUnifiedScale.textContent = `${sliderUnifiedScale.value}%`;
+        }
+      } else if (target === 'both') {
+        if (lblUnifiedX) lblUnifiedX.textContent = 'Both Horizontal (Shift All)';
+        if (sliderUnifiedX && sliderDigitOffsetX) {
+          sliderUnifiedX.min = -40;
+          sliderUnifiedX.max = 40;
+          sliderUnifiedX.value = sliderDigitOffsetX.value || 0;
+          if (valUnifiedX) valUnifiedX.textContent = `${sliderDigitOffsetX.value}%`;
+        }
+        if (lblUnifiedY) lblUnifiedY.textContent = 'Both Vertical (Shift All)';
+        if (sliderUnifiedY && sliderDigitOffsetY) {
+          sliderUnifiedY.min = -40;
+          sliderUnifiedY.max = 40;
+          sliderUnifiedY.value = sliderDigitOffsetY.value || 0;
+          if (valUnifiedY) valUnifiedY.textContent = `${sliderDigitOffsetY.value}%`;
+        }
+        if (lblUnifiedScale) lblUnifiedScale.textContent = 'Both Scale (Digit Baseline)';
+        if (sliderUnifiedScale && sliderTextSize) {
+          sliderUnifiedScale.min = 20;
+          sliderUnifiedScale.max = 95;
+          sliderUnifiedScale.value = sliderTextSize.value || 72;
+          if (valUnifiedScale) valUnifiedScale.textContent = `${sliderTextSize.value}%`;
+        }
+      }
+      lastUnifiedX = sliderUnifiedX ? parseInt(sliderUnifiedX.value, 10) : 0;
+      lastUnifiedY = sliderUnifiedY ? parseInt(sliderUnifiedY.value, 10) : 0;
+      lastUnifiedScale = sliderUnifiedScale ? parseInt(sliderUnifiedScale.value, 10) : 72;
     }
-    if (sliderUnitScale) {
-      sliderUnitScale.addEventListener('input', (e) => {
-        valUnitScale.textContent = `${e.target.value}%`;
+
+    if (sliderUnifiedX) {
+      sliderUnifiedX.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const target = getActiveTarget();
+        if (target === 'digits') {
+          if (sliderDigitOffsetX) sliderDigitOffsetX.value = val;
+          if (valDigitOffsetX) valDigitOffsetX.textContent = `${val}%`;
+        } else if (target === 'unit') {
+          if (sliderUnitOffsetX) sliderUnitOffsetX.value = val;
+          if (valUnitOffsetX) valUnitOffsetX.textContent = `${val}%`;
+        } else if (target === 'both') {
+          const delta = val - lastUnifiedX;
+          if (sliderDigitOffsetX) {
+            let dx = Math.max(-40, Math.min(40, parseInt(sliderDigitOffsetX.value, 10) + delta));
+            sliderDigitOffsetX.value = dx;
+            if (valDigitOffsetX) valDigitOffsetX.textContent = `${dx}%`;
+          }
+          if (sliderUnitOffsetX) {
+            let ux = Math.max(-40, Math.min(40, parseInt(sliderUnitOffsetX.value, 10) + delta));
+            sliderUnitOffsetX.value = ux;
+            if (valUnitOffsetX) valUnitOffsetX.textContent = `${ux}%`;
+          }
+        }
+        lastUnifiedX = val;
+        if (valUnifiedX) valUnifiedX.textContent = `${val}%`;
         renderPipeline();
       });
     }
 
-    // 4-Way D-Pad Nudge Function for 1-Tap Mobile/Desktop Control
-    function nudgeUnit(dx, dy) {
-      if (dx !== 0 && sliderUnitOffsetX) {
-        let val = parseInt(sliderUnitOffsetX.value, 10) + dx;
-        val = Math.max(-30, Math.min(30, val));
-        sliderUnitOffsetX.value = val;
-        valUnitOffsetX.textContent = `${val}%`;
+    if (sliderUnifiedY) {
+      sliderUnifiedY.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const target = getActiveTarget();
+        if (target === 'digits') {
+          if (sliderDigitOffsetY) sliderDigitOffsetY.value = val;
+          if (valDigitOffsetY) valDigitOffsetY.textContent = `${val}%`;
+        } else if (target === 'unit') {
+          if (sliderUnitOffsetY) sliderUnitOffsetY.value = val;
+          if (valUnitOffsetY) valUnitOffsetY.textContent = `${val}%`;
+        } else if (target === 'both') {
+          const delta = val - lastUnifiedY;
+          if (sliderDigitOffsetY) {
+            let dy = Math.max(-40, Math.min(40, parseInt(sliderDigitOffsetY.value, 10) + delta));
+            sliderDigitOffsetY.value = dy;
+            if (valDigitOffsetY) valDigitOffsetY.textContent = `${dy}%`;
+          }
+          if (sliderUnitOffsetY) {
+            let uy = Math.max(-40, Math.min(40, parseInt(sliderUnitOffsetY.value, 10) + delta));
+            sliderUnitOffsetY.value = uy;
+            if (valUnitOffsetY) valUnitOffsetY.textContent = `${uy}%`;
+          }
+        }
+        lastUnifiedY = val;
+        if (valUnifiedY) valUnifiedY.textContent = `${val}%`;
+        renderPipeline();
+      });
+    }
+
+    if (sliderUnifiedScale) {
+      sliderUnifiedScale.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const target = getActiveTarget();
+        if (target === 'digits') {
+          if (sliderTextSize) sliderTextSize.value = val;
+          if (valTextSize) valTextSize.textContent = `${val}%`;
+        } else if (target === 'unit') {
+          if (sliderUnitScale) sliderUnitScale.value = val;
+          if (valUnitScale) valUnitScale.textContent = `${val}%`;
+        } else if (target === 'both') {
+          const delta = val - lastUnifiedScale;
+          if (sliderTextSize) {
+            let ds = Math.max(20, Math.min(95, parseInt(sliderTextSize.value, 10) + delta));
+            sliderTextSize.value = ds;
+            if (valTextSize) valTextSize.textContent = `${ds}%`;
+          }
+          if (sliderUnitScale) {
+            let us = Math.max(20, Math.min(80, parseInt(sliderUnitScale.value, 10) + Math.round(delta * 0.6)));
+            sliderUnitScale.value = us;
+            if (valUnitScale) valUnitScale.textContent = `${us}%`;
+          }
+        }
+        lastUnifiedScale = val;
+        if (valUnifiedScale) valUnifiedScale.textContent = `${val}%`;
+        renderPipeline();
+      });
+    }
+
+    // Radio change event listener
+    radioPosTargets.forEach(radio => {
+      radio.addEventListener('change', () => {
+        updateUnifiedUIFromTarget();
+      });
+    });
+
+    // 4-Way Unified D-Pad Nudge
+    function nudgeUnified(dx, dy) {
+      const target = getActiveTarget();
+      if (target === 'digits') {
+        if (dx !== 0 && sliderDigitOffsetX) {
+          let val = Math.max(-40, Math.min(40, parseInt(sliderDigitOffsetX.value, 10) + dx));
+          sliderDigitOffsetX.value = val;
+          if (valDigitOffsetX) valDigitOffsetX.textContent = `${val}%`;
+        }
+        if (dy !== 0 && sliderDigitOffsetY) {
+          let val = Math.max(-40, Math.min(40, parseInt(sliderDigitOffsetY.value, 10) + dy));
+          sliderDigitOffsetY.value = val;
+          if (valDigitOffsetY) valDigitOffsetY.textContent = `${val}%`;
+        }
+      } else if (target === 'unit') {
+        if (dx !== 0 && sliderUnitOffsetX) {
+          let val = Math.max(-40, Math.min(40, parseInt(sliderUnitOffsetX.value, 10) + dx));
+          sliderUnitOffsetX.value = val;
+          if (valUnitOffsetX) valUnitOffsetX.textContent = `${val}%`;
+        }
+        if (dy !== 0 && sliderUnitOffsetY) {
+          let val = Math.max(-40, Math.min(40, parseInt(sliderUnitOffsetY.value, 10) + dy));
+          sliderUnitOffsetY.value = val;
+          if (valUnitOffsetY) valUnitOffsetY.textContent = `${val}%`;
+        }
+      } else if (target === 'both') {
+        if (dx !== 0) {
+          if (sliderDigitOffsetX) {
+            let val = Math.max(-40, Math.min(40, parseInt(sliderDigitOffsetX.value, 10) + dx));
+            sliderDigitOffsetX.value = val;
+            if (valDigitOffsetX) valDigitOffsetX.textContent = `${val}%`;
+          }
+          if (sliderUnitOffsetX) {
+            let val = Math.max(-40, Math.min(40, parseInt(sliderUnitOffsetX.value, 10) + dx));
+            sliderUnitOffsetX.value = val;
+            if (valUnitOffsetX) valUnitOffsetX.textContent = `${val}%`;
+          }
+        }
+        if (dy !== 0) {
+          if (sliderDigitOffsetY) {
+            let val = Math.max(-40, Math.min(40, parseInt(sliderDigitOffsetY.value, 10) + dy));
+            sliderDigitOffsetY.value = val;
+            if (valDigitOffsetY) valDigitOffsetY.textContent = `${val}%`;
+          }
+          if (sliderUnitOffsetY) {
+            let val = Math.max(-40, Math.min(40, parseInt(sliderUnitOffsetY.value, 10) + dy));
+            sliderUnitOffsetY.value = val;
+            if (valUnitOffsetY) valUnitOffsetY.textContent = `${val}%`;
+          }
+        }
       }
-      if (dy !== 0 && sliderUnitOffsetY) {
-        let val = parseInt(sliderUnitOffsetY.value, 10) + dy;
-        val = Math.max(-30, Math.min(30, val));
-        sliderUnitOffsetY.value = val;
-        valUnitOffsetY.textContent = `${val}%`;
-      }
+      updateUnifiedUIFromTarget();
       renderPipeline();
     }
 
-    if (btnUnitLeft) btnUnitLeft.addEventListener('click', () => nudgeUnit(-2, 0));
-    if (btnUnitRight) btnUnitRight.addEventListener('click', () => nudgeUnit(2, 0));
-    if (btnUnitUp) btnUnitUp.addEventListener('click', () => nudgeUnit(0, -2));
-    if (btnUnitDown) btnUnitDown.addEventListener('click', () => nudgeUnit(0, 2));
+    if (btnUnifiedLeft) btnUnifiedLeft.addEventListener('click', () => nudgeUnified(-2, 0));
+    if (btnUnifiedRight) btnUnifiedRight.addEventListener('click', () => nudgeUnified(2, 0));
+    if (btnUnifiedUp) btnUnifiedUp.addEventListener('click', () => nudgeUnified(0, -2));
+    if (btnUnifiedDown) btnUnifiedDown.addEventListener('click', () => nudgeUnified(0, 2));
 
-    if (btnResetUnitPos) {
-      btnResetUnitPos.addEventListener('click', () => {
-        if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; valUnitOffsetX.textContent = '0%'; }
-        if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; valUnitOffsetY.textContent = '0%'; }
-        if (sliderUnitScale) { sliderUnitScale.value = 44; valUnitScale.textContent = '44%'; }
+    // Unified Reset Button
+    if (btnUnifiedReset) {
+      btnUnifiedReset.addEventListener('click', () => {
+        const target = getActiveTarget();
+        if (target === 'digits' || target === 'both') {
+          if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; if (valDigitOffsetX) valDigitOffsetX.textContent = '0%'; }
+          if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; if (valDigitOffsetY) valDigitOffsetY.textContent = '0%'; }
+          if (sliderTextSize) { sliderTextSize.value = 72; if (valTextSize) valTextSize.textContent = '72%'; }
+          if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; if (valDigitCropZoom) valDigitCropZoom.textContent = '100%'; }
+          if (sliderDigitAngle) { sliderDigitAngle.value = 0; if (valDigitAngle) valDigitAngle.textContent = '0.0°'; }
+        }
+        if (target === 'unit' || target === 'both') {
+          if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; if (valUnitOffsetX) valUnitOffsetX.textContent = '0%'; }
+          if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; if (valUnitOffsetY) valUnitOffsetY.textContent = '0%'; }
+          if (sliderUnitScale) { sliderUnitScale.value = 44; if (valUnitScale) valUnitScale.textContent = '44%'; }
+        }
+        updateUnifiedUIFromTarget();
         renderPipeline();
       });
     }
 
+    // Digit Fine-Tuning: Crop Zoom & Tilt
+    if (sliderDigitCropZoom) {
+      sliderDigitCropZoom.addEventListener('input', (e) => {
+        if (valDigitCropZoom) valDigitCropZoom.textContent = `${e.target.value}%`;
+        renderPipeline();
+      });
+    }
+    if (sliderDigitAngle) {
+      sliderDigitAngle.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        if (valDigitAngle) valDigitAngle.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}°`;
+        renderPipeline();
+      });
+    }
+
+    function nudgeAngle(delta) {
+      if (sliderDigitAngle) {
+        let val = parseFloat(sliderDigitAngle.value) + delta;
+        val = Math.max(-15, Math.min(15, Math.round(val * 10) / 10));
+        sliderDigitAngle.value = val;
+        if (valDigitAngle) valDigitAngle.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}°`;
+        renderPipeline();
+      }
+    }
+
+    if (btnDigitTiltCCW) btnDigitTiltCCW.addEventListener('click', () => nudgeAngle(-0.5));
+    if (btnDigitTiltCW) btnDigitTiltCW.addEventListener('click', () => nudgeAngle(0.5));
+
+    // Preset button reference
     function applyReferencePreset() {
       inputReading.value = '000812';
       inputUnit.value = 'kWh';
@@ -1989,14 +2232,13 @@
       sliderTextSize.value = 72;
       valTextSize.textContent = '72%';
 
-
-      if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; valUnitOffsetX.textContent = '0%'; }
-      if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; valUnitOffsetY.textContent = '0%'; }
-      if (sliderUnitScale) { sliderUnitScale.value = 44; valUnitScale.textContent = '44%'; }
-      if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; valDigitOffsetX.textContent = '0%'; }
-      if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; valDigitOffsetY.textContent = '0%'; }
-      if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; valDigitCropZoom.textContent = '100%'; }
-      if (sliderDigitAngle) { sliderDigitAngle.value = 0; valDigitAngle.textContent = '0.0°'; }
+      if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; if (valUnitOffsetX) valUnitOffsetX.textContent = '0%'; }
+      if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; if (valUnitOffsetY) valUnitOffsetY.textContent = '0%'; }
+      if (sliderUnitScale) { sliderUnitScale.value = 44; if (valUnitScale) valUnitScale.textContent = '44%'; }
+      if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; if (valDigitOffsetX) valDigitOffsetX.textContent = '0%'; }
+      if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; if (valDigitOffsetY) valDigitOffsetY.textContent = '0%'; }
+      if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; if (valDigitCropZoom) valDigitCropZoom.textContent = '100%'; }
+      if (sliderDigitAngle) { sliderDigitAngle.value = 0; if (valDigitAngle) valDigitAngle.textContent = '0.0°'; }
 
       sliderBlur.value = 6;
       valBlur.textContent = '0.6 px';
@@ -2010,6 +2252,7 @@
       sliderInpaint.value = 35;
       valInpaint.textContent = '35%';
 
+      updateUnifiedUIFromTarget();
       renderPipeline();
     }
 
@@ -2017,77 +2260,8 @@
       btnApplyReferencePreset.addEventListener('click', applyReferencePreset);
     }
 
-    // ===== Digit Position & Crop Controls =====
-    if (sliderDigitOffsetX) {
-      sliderDigitOffsetX.addEventListener('input', (e) => {
-        valDigitOffsetX.textContent = `${e.target.value}%`;
-        renderPipeline();
-      });
-    }
-    if (sliderDigitOffsetY) {
-      sliderDigitOffsetY.addEventListener('input', (e) => {
-        valDigitOffsetY.textContent = `${e.target.value}%`;
-        renderPipeline();
-      });
-    }
-    if (sliderDigitCropZoom) {
-      sliderDigitCropZoom.addEventListener('input', (e) => {
-        valDigitCropZoom.textContent = `${e.target.value}%`;
-        renderPipeline();
-      });
-    }
-    if (sliderDigitAngle) {
-      sliderDigitAngle.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        valDigitAngle.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}°`;
-        renderPipeline();
-      });
-    }
-
-    function nudgeAngle(delta) {
-      if (sliderDigitAngle) {
-        let val = parseFloat(sliderDigitAngle.value) + delta;
-        val = Math.max(-15, Math.min(15, Math.round(val * 10) / 10));
-        sliderDigitAngle.value = val;
-        valDigitAngle.textContent = `${val > 0 ? '+' : ''}${val.toFixed(1)}°`;
-        renderPipeline();
-      }
-    }
-
-    if (btnDigitTiltCCW) btnDigitTiltCCW.addEventListener('click', () => nudgeAngle(-0.5));
-    if (btnDigitTiltCW) btnDigitTiltCW.addEventListener('click', () => nudgeAngle(0.5));
-
-    // Digit 4-Way D-Pad Nudge
-    function nudgeDigit(dx, dy) {
-      if (dx !== 0 && sliderDigitOffsetX) {
-        let val = parseInt(sliderDigitOffsetX.value, 10) + dx;
-        val = Math.max(-40, Math.min(40, val));
-        sliderDigitOffsetX.value = val;
-        valDigitOffsetX.textContent = `${val}%`;
-      }
-      if (dy !== 0 && sliderDigitOffsetY) {
-        let val = parseInt(sliderDigitOffsetY.value, 10) + dy;
-        val = Math.max(-40, Math.min(40, val));
-        sliderDigitOffsetY.value = val;
-        valDigitOffsetY.textContent = `${val}%`;
-      }
-      renderPipeline();
-    }
-
-    if (btnDigitLeft) btnDigitLeft.addEventListener('click', () => nudgeDigit(-2, 0));
-    if (btnDigitRight) btnDigitRight.addEventListener('click', () => nudgeDigit(2, 0));
-    if (btnDigitUp) btnDigitUp.addEventListener('click', () => nudgeDigit(0, -2));
-    if (btnDigitDown) btnDigitDown.addEventListener('click', () => nudgeDigit(0, 2));
-
-    if (btnResetDigitPos) {
-      btnResetDigitPos.addEventListener('click', () => {
-        if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; valDigitOffsetX.textContent = '0%'; }
-        if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; valDigitOffsetY.textContent = '0%'; }
-        if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; valDigitCropZoom.textContent = '100%'; }
-        if (sliderDigitAngle) { sliderDigitAngle.value = 0; valDigitAngle.textContent = '0.0°'; }
-        renderPipeline();
-      });
-    }
+    // Initialize unified slider values on load
+    updateUnifiedUIFromTarget();
 
     inputReading.addEventListener('input', (e) => {
       previewReading.textContent = e.target.value || '';
