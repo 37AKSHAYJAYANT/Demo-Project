@@ -1157,9 +1157,9 @@
         <div class="form-group" style="margin-bottom: 26px; padding: 0 2px;">
           <div class="form-label" style="margin-bottom: 8px;">
             <span id="lblUnifiedScale">Digit Text Scale</span>
-            <span class="form-val" id="valUnifiedScale">72%</span>
+            <span class="form-val" id="valUnifiedScale">64%</span>
           </div>
-          <input type="range" id="sliderUnifiedScale" class="slider" min="20" max="95" value="72">
+          <input type="range" id="sliderUnifiedScale" class="slider" min="20" max="95" value="64">
         </div>
 
         <!-- Digit Fine-Tuning: Crop Zoom -->
@@ -1193,8 +1193,8 @@
         <span id="valUnitOffsetX" style="display:none;">0%</span>
         <input type="hidden" id="sliderUnitOffsetY" value="0">
         <span id="valUnitOffsetY" style="display:none;">0%</span>
-        <input type="hidden" id="sliderUnitScale" value="44">
-        <span id="valUnitScale" style="display:none;">44%</span>
+        <input type="hidden" id="sliderUnitScale" value="37">
+        <span id="valUnitScale" style="display:none;">37%</span>
       </div>
 
       <!-- Photorealistic Sliders -->
@@ -1209,7 +1209,15 @@
           ✨ Apply Reference Configuration
         </button>
 
-        <!-- Emerald Backlight Glow (Subtle color enhancement for dull screens) -->
+        <!-- Edit Realism Manually Toggle Button -->
+        <button id="btnToggleRealism" class="btn btn-secondary"
+          style="width: 100%; margin-bottom: 4px; justify-content: center; font-weight: 600; font-size: 0.85rem; padding: 9px 12px; gap: 8px; border: 1px dashed var(--border-color); background: rgba(15, 23, 42, 0.55); color: #cbd5e1; cursor: pointer;">
+          ✏️ Edit Realism Manually <span id="realismChevron" style="font-size: 0.75rem;">▼</span>
+        </button>
+
+        <!-- Collapsible Sliders Container (Hidden by default, opens on Edit Manually) -->
+        <div id="realismSlidersContainer" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+<!-- Emerald Backlight Glow (Subtle color enhancement for dull screens) -->
         <div class="form-group">
           <div class="form-label">
             <span>Emerald Screen Backlight Glow</span>
@@ -1245,14 +1253,9 @@
           <input type="range" id="sliderDust" class="slider" min="0" max="100" value="25">
         </div>
 
-        <!-- Text Size -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>Text Scale</span>
-            <span class="form-val" id="valTextSize">72%</span>
-          </div>
-          <input type="range" id="sliderTextSize" class="slider" min="20" max="95" value="72">
-        </div>
+        <!-- Text Scale removed (controlled via unified Position & Scale section) -->
+        <input type="hidden" id="sliderTextSize" value="64">
+        <span id="valTextSize" style="display:none;">64%</span>
 
 
 
@@ -1291,7 +1294,7 @@
           </div>
           <input type="range" id="sliderInpaint" class="slider" min="0" max="100" value="35">
         </div>
-
+        </div>
       </div>
 
     </div>
@@ -1924,7 +1927,7 @@
     // ==========================================
     let lastUnifiedX = 0;
     let lastUnifiedY = 0;
-    let lastUnifiedScale = 72;
+    let lastUnifiedScale = 64;
 
     function getActiveTarget() {
       const checkedRadio = document.querySelector('input[name="posTarget"]:checked');
@@ -1952,7 +1955,7 @@
         if (sliderUnifiedScale && sliderTextSize) {
           sliderUnifiedScale.min = 20;
           sliderUnifiedScale.max = 95;
-          sliderUnifiedScale.value = sliderTextSize.value || 72;
+          sliderUnifiedScale.value = sliderTextSize.value || 64;
           if (valUnifiedScale) valUnifiedScale.textContent = `${sliderUnifiedScale.value}%`;
         }
       } else if (target === 'unit') {
@@ -1974,7 +1977,7 @@
         if (sliderUnifiedScale && sliderUnitScale) {
           sliderUnifiedScale.min = 20;
           sliderUnifiedScale.max = 80;
-          sliderUnifiedScale.value = sliderUnitScale.value || 44;
+          sliderUnifiedScale.value = sliderUnitScale.value || 37;
           if (valUnifiedScale) valUnifiedScale.textContent = `${sliderUnifiedScale.value}%`;
         }
       } else if (target === 'both') {
@@ -1996,13 +1999,13 @@
         if (sliderUnifiedScale && sliderTextSize) {
           sliderUnifiedScale.min = 20;
           sliderUnifiedScale.max = 95;
-          sliderUnifiedScale.value = sliderTextSize.value || 72;
+          sliderUnifiedScale.value = sliderTextSize.value || 64;
           if (valUnifiedScale) valUnifiedScale.textContent = `${sliderTextSize.value}%`;
         }
       }
       lastUnifiedX = sliderUnifiedX ? parseInt(sliderUnifiedX.value, 10) : 0;
       lastUnifiedY = sliderUnifiedY ? parseInt(sliderUnifiedY.value, 10) : 0;
-      lastUnifiedScale = sliderUnifiedScale ? parseInt(sliderUnifiedScale.value, 10) : 72;
+      lastUnifiedScale = sliderUnifiedScale ? parseInt(sliderUnifiedScale.value, 10) : 64;
     }
 
     if (sliderUnifiedX) {
@@ -2166,14 +2169,14 @@
         if (target === 'digits' || target === 'both') {
           if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; if (valDigitOffsetX) valDigitOffsetX.textContent = '0%'; }
           if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; if (valDigitOffsetY) valDigitOffsetY.textContent = '0%'; }
-          if (sliderTextSize) { sliderTextSize.value = 72; if (valTextSize) valTextSize.textContent = '72%'; }
+          if (sliderTextSize) { sliderTextSize.value = 64; if (valTextSize) valTextSize.textContent = '64%'; }
           if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; if (valDigitCropZoom) valDigitCropZoom.textContent = '100%'; }
           if (sliderDigitAngle) { sliderDigitAngle.value = 0; if (valDigitAngle) valDigitAngle.textContent = '0.0°'; }
         }
         if (target === 'unit' || target === 'both') {
           if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; if (valUnitOffsetX) valUnitOffsetX.textContent = '0%'; }
           if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; if (valUnitOffsetY) valUnitOffsetY.textContent = '0%'; }
-          if (sliderUnitScale) { sliderUnitScale.value = 44; if (valUnitScale) valUnitScale.textContent = '44%'; }
+          if (sliderUnitScale) { sliderUnitScale.value = 37; if (valUnitScale) valUnitScale.textContent = '37%'; }
         }
         updateUnifiedUIFromTarget();
         renderPipeline();
@@ -2229,12 +2232,12 @@
       sliderDust.value = 25;
       valDust.textContent = '25%';
 
-      sliderTextSize.value = 72;
-      valTextSize.textContent = '72%';
+      sliderTextSize.value = 64;
+      valTextSize.textContent = '64%';
 
       if (sliderUnitOffsetX) { sliderUnitOffsetX.value = 0; if (valUnitOffsetX) valUnitOffsetX.textContent = '0%'; }
       if (sliderUnitOffsetY) { sliderUnitOffsetY.value = 0; if (valUnitOffsetY) valUnitOffsetY.textContent = '0%'; }
-      if (sliderUnitScale) { sliderUnitScale.value = 44; if (valUnitScale) valUnitScale.textContent = '44%'; }
+      if (sliderUnitScale) { sliderUnitScale.value = 37; if (valUnitScale) valUnitScale.textContent = '37%'; }
       if (sliderDigitOffsetX) { sliderDigitOffsetX.value = 0; if (valDigitOffsetX) valDigitOffsetX.textContent = '0%'; }
       if (sliderDigitOffsetY) { sliderDigitOffsetY.value = 0; if (valDigitOffsetY) valDigitOffsetY.textContent = '0%'; }
       if (sliderDigitCropZoom) { sliderDigitCropZoom.value = 100; if (valDigitCropZoom) valDigitCropZoom.textContent = '100%'; }
@@ -2261,6 +2264,32 @@
     }
 
     // Initialize unified slider values on load
+    
+    // ==========================================
+    // Realism & Compositing Manual Toggle
+    // ==========================================
+    const btnToggleRealism = document.getElementById('btnToggleRealism');
+    const realismSlidersContainer = document.getElementById('realismSlidersContainer');
+
+    if (btnToggleRealism && realismSlidersContainer) {
+      btnToggleRealism.addEventListener('click', () => {
+        const isHidden = realismSlidersContainer.style.display === 'none' || realismSlidersContainer.style.display === '';
+        if (isHidden) {
+          realismSlidersContainer.style.display = 'block';
+          btnToggleRealism.innerHTML = '✏️ Hide Manual Sliders <span id="realismChevron" style="font-size: 0.75rem;">▲</span>';
+          btnToggleRealism.style.borderColor = 'var(--accent)';
+          btnToggleRealism.style.color = '#38bdf8';
+          btnToggleRealism.style.background = 'rgba(56, 189, 248, 0.12)';
+        } else {
+          realismSlidersContainer.style.display = 'none';
+          btnToggleRealism.innerHTML = '✏️ Edit Realism Manually <span id="realismChevron" style="font-size: 0.75rem;">▼</span>';
+          btnToggleRealism.style.borderColor = 'var(--border-color)';
+          btnToggleRealism.style.color = '#cbd5e1';
+          btnToggleRealism.style.background = 'rgba(15, 23, 42, 0.55)';
+        }
+      });
+    }
+
     updateUnifiedUIFromTarget();
 
     inputReading.addEventListener('input', (e) => {
@@ -2480,7 +2509,7 @@
 
       // Unit font size matching reference meter stamp (controlled independently by sliderUnitScale)
       // Scaled directly against screen height (targetH) so changing Digit Size NEVER alters kWh font size
-      const unitScaleVal = sliderUnitScale ? parseInt(sliderUnitScale.value, 10) : 44;
+      const unitScaleVal = sliderUnitScale ? parseInt(sliderUnitScale.value, 10) : 37;
       const unitScalePercent = unitScaleVal / 100;
       const unitFontSize = Math.max(Math.round(targetH * (unitScalePercent * 0.70)), 10);
       tCtx.font = `bold ${unitFontSize}px "Segoe UI", Arial, sans-serif`;
